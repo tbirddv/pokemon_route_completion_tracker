@@ -5,8 +5,8 @@ For simplicity sake I am going to start with Pokemon Red/Blue and track based on
 That is for the first implementation the user will type the Route/Area they are tracking into the command line and the program will return:
 
 1. A list of caught pokemon
-2. A list of uncaught pokemon available in the version of the game being tracked (if provided, otherwise 2 and 3 will be combined into one list)
-3. A list of uncaught pokemon unavailable in the version of the game being tracked (if provided, otherwise 2 and 3 will be combined into one list)
+2. A list of uncaught pokemon available in the version of the game being tracked
+3. A list of uncaught pokemon available in the other games from the same generation on that route
 
 Future features may include (in no particular order):
 - a GUI rather than CLI
