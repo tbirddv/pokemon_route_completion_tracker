@@ -1,4 +1,4 @@
-﻿area_name, red_walking,red_surfing,red_fishing,red_other,blue_walking,blue_surfing,blue_fishing,blue_other,yellow_walking,yellow_surfing,yellow_fishing,yellow_other
+Area Name,Red Walking,Red Surfing,Red Fishing,Red Other,Blue Walking,Blue Surfing,Blue Fishing,Blue Other,Yellow Walking,Yellow Surfing,Yellow Fishing,Yellow Other
 Route 1,Main:Pidgey/Rattata,None,None,None,Main:Pidgey/Rattata,None,None,None,Main:Pidgey/Rattata,None,None,None
 Route 2,Main:Pidgey/Rattata/Weedle,None,None,Main~Trade:Mr. Mime,Main:Pidgey/Rattata/Caterpie,None,None,Main~Trade:Mr. Mime,Main:Pidgey/Rattata/Nidoran♀/Nidoran♂,None,None,Main~Trade:Mr. Mime
 Route 3,Main:Pidgey/Spearow/Jigglypuff,None,None,None,Main:Pidgey/Spearow/Jigglypuff,None,None,None,Main:Spearow/Rattata/Sandshrew/Mankey,None,None,None

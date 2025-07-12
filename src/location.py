@@ -118,3 +118,34 @@ class Gen1Location(Location):
                             self.yellow_other_const[subloc_name] = {subtype.split(':')[0].strip(): [pokemon.strip() for pokemon in subtype.split(':')[1].strip().split('/') if pokemon.strip() != '' and pokemon.strip().lower() != "none"]
                                                              for subtype in subtypes if ':' in subtype and len(subtype.split(':')) == 2 and subtype.split(':')[1].strip() != '' and subtype.split(':')[1].strip().lower() != "none"}
         self.yellow_other_uncaught = copy.deepcopy(self.yellow_other_const)
+
+
+    def __repr__(self):
+        lines = [f"Gen1 Location Name: {self.name}"]
+        
+        if self.red_walking_const:
+            lines.append(f"Red Walking: {self.red_walking_const}")
+        if self.red_surfing_const:
+            lines.append(f"Red Surfing: {self.red_surfing_const}")
+        if self.red_fishing_const:
+            lines.append(f"Red Fishing: {self.red_fishing_const}")
+        if self.red_other_const:
+            lines.append(f"Red Other: {self.red_other_const}")
+        if self.blue_walking_const:
+            lines.append(f"Blue Walking: {self.blue_walking_const}")
+        if self.blue_surfing_const:
+            lines.append(f"Blue Surfing: {self.blue_surfing_const}")
+        if self.blue_fishing_const:
+            lines.append(f"Blue Fishing: {self.blue_fishing_const}")
+        if self.blue_other_const:
+            lines.append(f"Blue Other: {self.blue_other_const}")
+        if self.yellow_walking_const:
+            lines.append(f"Yellow Walking: {self.yellow_walking_const}")
+        if self.yellow_surfing_const:
+            lines.append(f"Yellow Surfing: {self.yellow_surfing_const}")
+        if self.yellow_fishing_const:
+            lines.append(f"Yellow Fishing: {self.yellow_fishing_const}")
+        if self.yellow_other_const:
+            lines.append(f"Yellow Other: {self.yellow_other_const}")
+        
+        return ",\n".join(lines)

@@ -1,152 +1,152 @@
-﻿Name, RED Routes, RED Uniques, BLUE Routes, BLUE Uniques, YELLOW Routes, Yellow Uniques, Devolutions, Evolutions
-Bulbasaur, None, Pallet Town, None, Pallet Town, None, Cerulean City, None, Ivysaur/Venusaur
-Ivysaur, None, None, None, None, None, None, Bulbasaur, Venusaur
-Venusaur, None, None, None, None, None, None, Ivysaur/Venusaur, None
-Charmander, None, Pallet Town, None, Pallet Town,24, None, None, Charmeleon/Charizard
-Charmeleon, None, None, None, None, None, None, Charmander, Charizard
-Charizard, None, None, None, None, None, None, Charmander/Charmeleon, None
-Squirtle, None, Pallet Town, None, Pallet Town, None, Vermilion City, None, Wartortle/Blastoise
-Wartortle, None, None, None, None, None, None, Squirtle, Blastoise
-Blastoise, None, None, None, None, None, None, Squirtle/Wartortle, None
-Caterpie,25, Viridian Forest, 2/24/25, Viridian Forest, None, Viridian Forest, None, Metapod/Butterfree
-Metapod,25, Viridian Forest, 24/25, Viridian Forest, None, Viridian Forest, Caterpie, Butterfree
-Butterfree, None, None, None, None, None, None, Caterpie/Metapod, None
-Weedle, 2/24/25, Viridian Forest,25, Viridian Forest, None, None, None, Kakuna/Beedrill
-Kakuna, 24/25, Viridian Forest,25, Viridian Forest, None, None, Weedle, Beedrill
-Beedrill, None, None, None, None, None, None, Weedle/Kakuna, None
-Pidgey, 1/2/3/5/6/7/8/12/13/14/15/21/24/25, None, 1/2/3/5/6/7/8/12/13/14/15/21/24/25, None, 1/2/5/6/7/8/11/12/13/21/24/25, Viridian Forest, None, Pidgeotto/Pidgeot
-Pidgeotto, 14/15/21, None, 14/15/21, None, 5/6/7/8/11/12/13/14/15/21/24/25, Viridian Forest, Pidgey, Pidgeot
-Pidgeot, None, None, None, None, None, None, Pidgey/Pidgeotto, None
-Rattata, 1/2/4/9/16/21/22, None, 1/2/4/9/16/21/22, None, 1/2/3/4/5/6/7/8/9/10/11/16/18/21/22, Pokemon Mansion,None, Raticate
-Raticate, 16/17/18/21, None, 16/17/18/21, None, 9/10/11/16/18/21, Pokemon Mansion, Rattatta, None
-Spearow, 3/4/9/10/11/16/14/18/22/23, None, 3/4/9/10/11/16/14/18/22/23, None, 3/4/9/16/18/22, None, None, Fearow
-Fearow, 17/18/23, None, 17/18/23, None, 9/16/17/18/23, None, Spearow, None
-Ekans, 4/8/9/10/11/23, None, None, None, None, None, None, Arbok
-Arbok,23, Cerulean Cave, None, None, None, None, Ekans, None
-Pikachu, None, Viridian Forest/Power Plant, None, Viridian Forest/Power Plant, None, Pallet Town, None, Raichu
-Raichu, None, Cerulean Cave, None, Cerulean Cave/Power Plant, None, None, Pikachu, None
-Sandshrew, None, None, 4/8/9/10/11/23, None, 3/4, Mt. Moon, None, Sandslash
-Sandslash, None, None,23, Cerulean Cave, None, Cerulean Cave, Sandshrew, None
-Nidoran♀, 5/22, Underground Path 5-6/Safari Zone, 5/22, Underground Path 5-6/Safari Zone, 2/9/10/22, Safari Zone, None, Nidorina/Nidoqueen
-Nidorina,11, Celadon City/Safari Zone,11, Safari Zone, 9/23, Safari Zone, Nidoran♀, Nidoqueen
-Nidoqueen, None, None, None, None, None, None, Nidoran♀/Nidorina, None
-Nidoran♂,22, Safari Zone,22, Safari Zone, 2/9/10/22, Safari Zone, None, Nidorino/Nidoking
-Nidorino, None, Safari Zone, None, Celadon City/Safari Zone, 9/23, Safari Zone, Nidoran♂, Nidoking
-Nidoking, None, None, None, None, None, None, Nidoran♂/Nidorino, None
-Clefairy, None, Celadon City/Mt. Moon, None, Celadon City/Mt. Moon, None, Mt. Moon, None, Clefable
-Clefable, None, None, None, None, None, None, Clefairy, None
-Vulpix, None, None, 7/8, Pokemon Mansion, None, Celadon City, None, Ninetales
-Ninetales, None, None, None, None, None, None, Vulpix, None
-Jigglypuff,3, None,3, None, 5/6/7/8, None, None, Wigglytuff
-Wigglytuff, None, Cerulean Cave, None, Cerulean Cave, None, Celadon City, Jigglypuff, None
-Zubat, None, Mt. Moon/Rock Tunnel/Seafoam Islands/Victory Road, None, Mt. Moon/Rock Tunnel/Seafoam Islands/Victory Road, None, Mt. Moon/Rock Tunnel/Seafoam Islands/Victory Road, None, Golbat
-Golbat, None, Cerulean Cave/Seafoam Islands/Victory Road, None, Cerulean Cave/Seafoam Islands/Victory Road, None, Cerulean Cave/Seafoam Islands/Victory Road, Zubat, None
-Oddish, 5/6/7/12/13/14/15/24/25, None, None, None, 12/13/14/15/24/25, None, None, Gloom/Vileplume
-Gloom, 12/13/14/15, None, None, None, 12/13/14/15, Cerulean Cave, Oddish, Vileplume
-Vileplume, None, None, None, None, None, None, Oddish/Gloom, None
-Paras, None, Mt. Moon/Safari Zone, None, Mt. Moon/Safari Zone, None, Mt. Moon/Safari Zone, None, Parasect
-Parasect, None, Cerulean Cave/Safari Zone, None, Cerulean Cave/Safari Zone,18, Cerulean Cave/Safari Zone, Paras, None
-Venonat, 12/13/14/15, Safari Zone, 12/13/14/15, Safari Zone, 14/15/24/25, None, None, Venomoth
-Venomoth, None, Cerulean Cave/Safari Zone/Victory Road, None, Cerulean Cave/Safari Zone/Victory Road, 14/15, Cerulean Cave, Venonat, None
-Diglett, None, Diglett's Cave, None, Diglett's Cave, None, Diglett's Cave, None, Dugtrio
-Dugtrio, None, Diglett's Cave, None, Diglett's Cave,11, Diglett's Cave, Diglett, None
-Meowth, None, None, 5/6/7/8, None, None, None, None, Persian
-Persian, None, None, None, None, None, None, Meowth, None
-Psyduck, 24/25, Seafoam Islands/Safari Zone, 24/25, Seafoam Islands/Safari Zone,6, None, None, Golduck
-Golduck, None, Seafoam Islands, None, Seafoam Islands,6, None, Psyduck, None
-Mankey, 5/6/7/8, None, None, None, 3/4/22/23, None, None, Primeape
-Primeape, None, None, None, None,23, None, Mankey, None
-Growlithe, 7/8, Pokemon Mansion, None, None, None, Pokemon Mansion, None, Arcanine
-Arcanine, None, None, None, None, None, None, Growlithe, None
-Poliwag, 6/10/11/12/13/17/18/19/20/21/22/23/24/25, Celadon City/Cerulean Cave/Fuchsia City/Pallet Town/Seafoam Islands/Vermilion City/Viridian City, 6/10/11/12/13/17/18/19/20/21/22/23/24/25, Celadon City/Cerulean Cave/Fuchsia City/Pallet Town/Seafoam Islands/Vermilion City/Viridian City, 6/10/11/12/13/17/18/19/20/21/22/23/24/25, Celadon City/Cerulean Cave/Fuchsia City/Pallet Town/Seafoam Islands/Vermilion City/Viridian City, None, Poliwhirl/Poliwrath
-Poliwhirl,10, Celadon City,10, Celadon City, 22/23, None, Poliwag, Poliwrath
-Poliwrath, None, None, None, None, None, None, Poliwag/Poliwhirl, None
-Abra, 24/25, Celadon City, 24/25, Celadon City, 5/6/7/8, Celadon City, None, Kadabra/Alakazam
-Kadabra, None, Cerulean Cave, None, Cerulean Cave,8, None, Abra, Alakazam
-Alakazam, None, None, None, None, None, None, Abra/Kadabra, None
-Machop, None, Rock Tunnel/Victory Road, None, Rock Tunnel/Victory Road,10, Rock Tunnel, None, Machoke/Machamp
-Machoke, None, Victory Road, None, Victory Road,5, Underground Path 5-6/Victory Road, Machop, Machamp
-Machamp, None, None, None, None, None, None, Machop/Machoke, None
-Bellsprout, None, None, 5/6/7/12/13/14/15/24/25, None, 12/13/14/15/24/25, None, None, Weepinbell/Victreebel
-Weepinbell, None, None, 12/13/14/15, None, 12/13/14/15, Cerulean Cave, Bellsprout, Victreebel
-Victreebel, None, None, None, None, None, None, Bellsprout/Weepinbell, None
-Tentacool, 12/13/17/18/19/20/21, Pallet Town/Viridian City, 12/13/17/18/19/20/21, Pallet Town/Viridian City, 11/13/17/18/19/20/21, Pallet Town/Seafoam Islands/Vermilion City, None, Tentacruel
-Tentacruel, None, None, None, None, 19/20/21, None, Tentacool, None
-Geodude, None, Mt. Moon/Rock Tunnel/Victory Road, None, Mt. Moon/Rock Tunnel/Victory Road, None, Mt. Moon/Rock Tunnel/Victory Road, None, Graveler/Golem
-Graveler, None, Victory Road, None, Victory Road, None, Victory Road/Cerulean Cave, Geodude, Golem
-Golem, None, None, None, None, None, None, Geodude/Graveler, None
-Ponyta, None, Pokemon Mansion, None, Pokemon Mansion,17, None, None, Rapidash
-Rapidash, None, None, None, None, None, None, Ponyta, None
-Slowpoke,10, Celadon City/Seafoam Islands/Safari Zone,10, Celadon City/Seafoam Islands/Safari Zone, 12/13, Seafoam Islands, None, Slowbro
-Slowbro,23, Cerulean Cave/Seafoam Islands,23, Cerulean Cave/Seafoam Islands, 12/13, Seafoam Islands, Slowpoke, None
-Magnemtite, None, Power Plant, None, Power Plant,10, Power Plant, None, Magneton
-Magneton, None, Cerulean Cave/Power Plant, None, Cerulean Cave/Power Plant, None, Power Plant, Magnemite, None
-Farfetch'd, None, Vermilion City, None, Vermilion City, 12/13, None, None, None
-Doduo, 16/17/18, Safari Zone, 16/17/18, Safari Zone, 16/17/18, None, None,Dodrio
-Dodrio, None, Cerulean Cave, None, Cerulean Cave,17, None, Doduo, None
-Seel, None, Cinnabar Island/Seafoam Islands, None, Cinnabar Island/Seafoam Islands, None, Seafoam Islands, None, Dewgong
-Dewgong, None, Seafoam Islands, None, Seafoam Islands, None, Cinnabar Island/Seafoam Islands, Seel, None
-Grimer, None, Pokemon Mansion, None, Pokemon Mansion, None, Power Plant/Pokemon Mansion, None, Muk
-Muk, None, Pokemon Mansion, None, Pokemon Mansion, None, Cinabar Island/Power Plant/Pokemon Mansion, Grimer, None
-Shellder, 6/11/19/20/21, Seafoam Islands/Vermilion City, 6/11/19/20/21, Seafoam Islands/vermilion City, 17/18, Vermilion City, None, Cloyster
-Cloyster, None, None, None, None, None, None, Shellder, None
-Gastly, None, Pokemon Tower, None, Pokemon Tower, None, Pokemon Tower, None, Haunter/Gengar
-Haunter, None, Pokemon Tower, None, Pokemon Tower, None, Pokemon Tower, Ghastly, Gengar
-Gengar, None, None, None, None, None, None, Ghastly/Haunter, None
-Onix, None, Rock Tunnel/Victory Road, None, Rock Tunnel/Victory Road, None, Rock Tunnel/Victory Road, None, None
-Drowzee,11, None,11, None,11, None, None, Hypno
-Hypno, None, Cerulean Cave, None, Cerulean Cave, None, None, Drowzee, None
-Krabby, 6/11/12/13/17/18/24/25, Fuchsia City/Vermilion City/Safari Zone, 6/11/12/13/17/18/24/25, Fuchsia City/Seafoam Islands/Vermilion City/Safari Zone, 10/25, Seafoam Islands, None, Kingler
-Kingler,23, Cerulean Cave,23, Cerulean Cave/Seafoam Islands, 10/25, Seafoam Islands, Krabby, None
-Voltorb,10, Power Plant,10, Power Plant, None, Power Plant, None, Electrode
-Electrode, None, Cerulean Cave/Cinnabar Island, None, Cerulean Cave/Cinnabar Island, None, None, Voltorb, None
-Exeggcute, None, Safari Zone, None, Safari Zone, None, Safari Zone, None, Exeggutor
-Exeggutor, None, None, None, None, None, None, Exeggcute, None
-Cubone, None, Pokemon Tower, None, Pokemon Tower, None, Pokemon Tower/Safari Zone, None, Marowak
-Marowak, None, Cerulean Cave/Victory Road, None, Cerulean Cave/Victory Road, None, Safari Zone, Cubone, None
-Hitmonlee, None, Saffron City, None, Saffron City, None, Saffron City, None, None
-Hitmonchan, None, Saffron City, None, Saffron City, None, Saffron City, None, None
-Lickitung,18, None,18, None, None, Cerulean Cave, None, None
-Koffing, None, Pokemon Mansion, None, Pokemon Mansion, None, None, None, Weezing
-Weezing, None, Pokemon Mansion, None, Pokemon Mansion, None, None, Koffing, None
-Rhyhorn, None, Safari Zone, None, Safari Zone, None, Cerulean Cave/Safari Zone, None, Rhydon
-Rhydon, None, Cerulean Cave, None, Cerulean Cave, None, Cerulean Cave/Cinnabar Island, Rhyhorn, None
-Chansey, None, Cerulean Cave/Safari Zone, None, Cerulean Cave/Safari Zone, None, Cerulean Cave/Safari Zone, None, None
-Tangela,21, Cinnabar Island,21, Cinnabar Island, None, Safari Zone, None, None
-Kangaskhan, None, Safari Zone, None, Safari Zone, None, Safari Zone, None, None
-Horsea, 19/20/21, Seafoam Islands, 19/20/21, Seafoam Islands, 10/11/12/13, Vermilion City, None, Seadra
-Seadra,23, Cerulean Cave/Seafoam Islands,23, Cerulean Cave, 12/13, None, Horsea, None
-Goldeen, 6/10/11/12/13/17/18/19/20/21/22/23/24/25, Celadon City/Cerulean Cave/Fuchsia City/Pallet Town/Seafoam Islands/Vermilion City/Viridian City/Safari Zone, 6/10/11/12/13/17/18/19/20/21/22/23/24/25, Celadon City/Cerulean Cave/Fuchsia City/Pallet Town/Seafoam Islands/Vermilion City/Viridian City/Safari Zone, 6/10/11/12/13/17/18/19/20/21/22/23/24/25, Celadon City/Cerulean Cave/Fuchsia City/Pallet Town/Seafoam Islands/Vermilion City/Viridian City/Safari Zone, None, Seaking
-Seaking,23, Cerulean Cave/Fuchsia City,23, Cerulean Cave/Fuchsia City,24, Cerulean Cave,Goldeen, None
-Staryu, 19/20/21, Seafoam Islands, 19/20/21, Seafoam Islands, 19/20/21, Pallet Town/Seafoam Islands/Vermilion City, None, Starmie
-Starmie, None, None, None, None, None, None, Staryu, None
-Mr. Mime,2, None,2, None,2, None, None, None
-Scyther, None, Celadon City/Safari Zone, None, None, None, Celadon City/Safari Zone, None, None
-Jynx, None, Cerulean City, None, Cerulean City, None, None, None, None
-Electabuzz, None, Power Plant, None, None, None, None, None, None
-Magmar, None, None, None, Pokemon Mansion, None, None, None, None
-Pinsir, None, None, None, Celadon City/Safari Zone, None, Celadon City/Safari Zone, None, None
-Tauros, None, Safari Zone, None, Safari Zone, None, Safari Zone, None, None
-Magikarp, 4/6/10/11/12/13/17/18/19/20/21/22/23/24/25, Celadon City/Cerulean Cave/Fuchsia City/Pallet Town/Seafoam Islands/Vermilion City/Viridian City/Safari Zone, 4/6/10/11/12/13/17/18/19/20/21/22/23/24/25, Celadon City/Cerulean Cave/Fuchsia City/Pallet Town/Seafoam Islands/Vermilion City/Viridian City/Safari Zone, 4/6/10/11/12/13/17/18/19/20/21/22/23/24/25, Celadon City/Cerulean Cave/Fuchsia City/Pallet Town/Seafoam Islands/Vermilion City/Viridian City/Safari Zone, None, Gyarados
-Gyarados, None, None, None, None, None, Fuchsia City, Magikarp, None
-Lapras, None, Silph Co., None, Silph Co., None, Silph Co., None, None
-Ditto, 13/14/15/23, Cerulean Cave, 13/14/15/23, Cerulean Cave, None, Cerulean Cave/Pokemon Mansion, None, None
-Eevee, None, Celadon City, None, Celadon City, None, Celadon City, None, Vaporeon/Jolteon/Flareon
-Vaporeon, None, None, None, None, None, None, Eevee, None
-Jolteon, None, None, None, None, None, None, Eevee, None
-Flareon, None, None, None, None, None, None, Eevee, None
-Porygon, None, Celadon City, None, Celadon City, None, Celadon City, None, None
-Omanyte, None, Cinnabar Island, None, Cinnabar Island, None, Cinnabar Island, None, Omastar
-Omastar, None, None, None, None, None, None, None, Omanyte
-Kabuto, None, Cinnabar Island, None, Cinnabar Island, None, Cinnabar Island, None, Kabutops
-Kabutops, None, None, None, None, None, None, None, Kabuto
-Aerodactyl, None, Cinnabar Island, None, Cinnabar Island, None, Cinnabar Island, None, None
-Snorlax, 12/16, None, 12/16, None, 12/16, None, None, None
-Articuno, None, Seafoam Islands, None, Seafoam Islands, None, Seafoam Islands, None, None
-Zapdos, None, Power Plant, None, Power Plant, None, Power Plant, None, None
-Moltres, None, Victory Road, None, Victory Road, None, Victory Road, None, None
-Dratini, None, Celadon City/Safari Zone, None, Celadon City/Safari Zone, None, Safari Zone, None, Dragonair/Dragonite
-Dragonair, None, None, None, None, None, Safari Zone, Dratini, Dragonite
-Dragonite, None, None, None, None, None, None, Dratini/Dragonair, None
-Mewtwo, None, Cerulean Cave, None, Cerulean Cave, None, Cerulean Cave, None, None
-Mew, None, None, None, None, None, None, None, None
+Name,ID,Red Routes,Red Uniques,Blue Routes,Blue Uniques,Yellow Routes,Yellow Uniques,Devolutions,Evolutions
+Bulbasaur,1,None,Pallet Town,None,Pallet Town,None,Cerulean City,None,Ivysaur/Venusaur
+Ivysaur,2,None,None,None,None,None,None,Bulbasaur,Venusaur
+Venusaur,3,None,None,None,None,None,None,Ivysaur/Venusaur,None
+Charmander,4,None,Pallet Town,None,Pallet Town,24,None,None,Charmeleon/Charizard
+Charmeleon,5,None,None,None,None,None,None,Charmander,Charizard
+Charizard,6,None,None,None,None,None,None,Charmander/Charmeleon,None
+Squirtle,7,None,Pallet Town,None,Pallet Town,None,Vermilion City,None,Wartortle/Blastoise
+Wartortle,8,None,None,None,None,None,None,Squirtle,Blastoise
+Blastoise,9,None,None,None,None,None,None,Squirtle/Wartortle,None
+Caterpie,10,25,Viridian Forest,2/24/25,Viridian Forest,None,Viridian Forest,None,Metapod/Butterfree
+Metapod,11,25,Viridian Forest,24/25,Viridian Forest,None,Viridian Forest,Caterpie,Butterfree
+Butterfree,12,None,None,None,None,None,None,Caterpie/Metapod,None
+Weedle,13,2/24/25,Viridian Forest,25,Viridian Forest,None,None,None,Kakuna/Beedrill
+Kakuna,14,24/25,Viridian Forest,25,Viridian Forest,None,None,Weedle,Beedrill
+Beedrill,15,None,None,None,None,None,None,Weedle/Kakuna,None
+Pidgey,16,1/2/3/5/6/7/8/12/13/14/15/21/24/25,None,1/2/3/5/6/7/8/12/13/14/15/21/24/25,None,1/2/5/6/7/8/11/12/13/21/24/25,Viridian Forest,None,Pidgeotto/Pidgeot
+Pidgeotto,17,14/15/21,None,14/15/21,None,5/6/7/8/11/12/13/14/15/21/24/25,Viridian Forest,Pidgey,Pidgeot
+Pidgeot,18,None,None,None,None,None,None,Pidgey/Pidgeotto,None
+Rattata,19,1/2/4/9/16/21/22,None,1/2/4/9/16/21/22,None,1/2/3/4/5/6/7/8/9/10/11/16/18/21/22,Pokemon Mansion,None,Raticate
+Raticate,20,16/17/18/21,None,16/17/18/21,None,9/10/11/16/18/21,Pokemon Mansion,Rattatta,None
+Spearow,21,3/4/9/10/11/16/14/18/22/23,None,3/4/9/10/11/16/14/18/22/23,None,3/4/9/16/18/22,None,None,Fearow
+Fearow,22,17/18/23,None,17/18/23,None,9/16/17/18/23,None,Spearow,None
+Ekans,23,4/8/9/10/11/23,None,None,None,None,None,None,Arbok
+Arbok,24,23,Cerulean Cave,None,None,None,None,Ekans,None
+Pikachu,25,None,Viridian Forest/Power Plant,None,Viridian Forest/Power Plant,None,Pallet Town,None,Raichu
+Raichu,26,None,Cerulean Cave,None,Cerulean Cave/Power Plant,None,None,Pikachu,None
+Sandshrew,27,None,None,4/8/9/10/11/23,None,3/4,Mt. Moon,None,Sandslash
+Sandslash,28,None,None,23,Cerulean Cave,None,Cerulean Cave,Sandshrew,None
+Nidoran♀,29,5/22,Underground Path 5-6/Safari Zone,5/22,Underground Path 5-6/Safari Zone,2/9/10/22,Safari Zone,None,Nidorina/Nidoqueen
+Nidorina,30,11,Celadon City/Safari Zone,11,Safari Zone,9/23,Safari Zone,Nidoran♀,Nidoqueen
+Nidoqueen,31,None,None,None,None,None,None,Nidoran♀/Nidorina,None
+Nidoran♂,32,22,Safari Zone,22,Safari Zone,2/9/10/22,Safari Zone,None,Nidorino/Nidoking
+Nidorino,33,None,Safari Zone,None,Celadon City/Safari Zone,9/23,Safari Zone,Nidoran♂,Nidoking
+Nidoking,34,None,None,None,None,None,None,Nidoran♂/Nidorino,None
+Clefairy,35,None,Celadon City/Mt. Moon,None,Celadon City/Mt. Moon,None,Mt. Moon,None,Clefable
+Clefable,36,None,None,None,None,None,None,Clefairy,None
+Vulpix,37,None,None,7/8,Pokemon Mansion,None,Celadon City,None,Ninetales
+Ninetales,38,None,None,None,None,None,None,Vulpix,None
+Jigglypuff,39,3,None,3,None,5/6/7/8,None,None,Wigglytuff
+Wigglytuff,40,None,Cerulean Cave,None,Cerulean Cave,None,Celadon City,Jigglypuff,None
+Zubat,41,None,Mt. Moon/Rock Tunnel/Seafoam Islands/Victory Road,None,Mt. Moon/Rock Tunnel/Seafoam Islands/Victory Road,None,Mt. Moon/Rock Tunnel/Seafoam Islands/Victory Road,None,Golbat
+Golbat,42,None,Cerulean Cave/Seafoam Islands/Victory Road,None,Cerulean Cave/Seafoam Islands/Victory Road,None,Cerulean Cave/Seafoam Islands/Victory Road,Zubat,None
+Oddish,43,5/6/7/12/13/14/15/24/25,None,None,None,12/13/14/15/24/25,None,None,Gloom/Vileplume
+Gloom,44,12/13/14/15,None,None,None,12/13/14/15,Cerulean Cave,Oddish,Vileplume
+Vileplume,45,None,None,None,None,None,None,Oddish/Gloom,None
+Paras,46,None,Mt. Moon/Safari Zone,None,Mt. Moon/Safari Zone,None,Mt. Moon/Safari Zone,None,Parasect
+Parasect,47,None,Cerulean Cave/Safari Zone,None,Cerulean Cave/Safari Zone,18,Cerulean Cave/Safari Zone,Paras,None
+Venonat,48,12/13/14/15,Safari Zone,12/13/14/15,Safari Zone,14/15/24/25,None,None,Venomoth
+Venomoth,49,None,Cerulean Cave/Safari Zone/Victory Road,None,Cerulean Cave/Safari Zone/Victory Road,14/15,Cerulean Cave,Venonat,None
+Diglett,50,None,Diglett's Cave,None,Diglett's Cave,None,Diglett's Cave,None,Dugtrio
+Dugtrio,51,None,Diglett's Cave,None,Diglett's Cave,11,Diglett's Cave,Diglett,None
+Meowth,52,None,None,5/6/7/8,None,None,None,None,Persian
+Persian,53,None,None,None,None,None,None,Meowth,None
+Psyduck,54,24/25,Seafoam Islands/Safari Zone,24/25,Seafoam Islands/Safari Zone,6,None,None,Golduck
+Golduck,55,None,Seafoam Islands,None,Seafoam Islands,6,None,Psyduck,None
+Mankey,56,5/6/7/8,None,None,None,3/4/22/23,None,None,Primeape
+Primeape,57,None,None,None,None,23,None,Mankey,None
+Growlithe,58,7/8,Pokemon Mansion,None,None,None,Pokemon Mansion,None,Arcanine
+Arcanine,59,None,None,None,None,None,None,Growlithe,None
+Poliwag,60,6/10/11/12/13/17/18/19/20/21/22/23/24/25,Celadon City/Cerulean Cave/Fuchsia City/Pallet Town/Seafoam Islands/Vermilion City/Viridian City,6/10/11/12/13/17/18/19/20/21/22/23/24/25,Celadon City/Cerulean Cave/Fuchsia City/Pallet Town/Seafoam Islands/Vermilion City/Viridian City,6/10/11/12/13/17/18/19/20/21/22/23/24/25,Celadon City/Cerulean Cave/Fuchsia City/Pallet Town/Seafoam Islands/Vermilion City/Viridian City,None,Poliwhirl/Poliwrath
+Poliwhirl,61,10,Celadon City,10,Celadon City,22/23,None,Poliwag,Poliwrath
+Poliwrath,62,None,None,None,None,None,None,Poliwag/Poliwhirl,None
+Abra,63,24/25,Celadon City,24/25,Celadon City,5/6/7/8,Celadon City,None,Kadabra/Alakazam
+Kadabra,64,None,Cerulean Cave,None,Cerulean Cave,8,None,Abra,Alakazam
+Alakazam,65,None,None,None,None,None,None,Abra/Kadabra,None
+Machop,66,None,Rock Tunnel/Victory Road,None,Rock Tunnel/Victory Road,10,Rock Tunnel,None,Machoke/Machamp
+Machoke,67,None,Victory Road,None,Victory Road,5,Underground Path 5-6/Victory Road,Machop,Machamp
+Machamp,68,None,None,None,None,None,None,Machop/Machoke,None
+Bellsprout,69,None,None,5/6/7/12/13/14/15/24/25,None,12/13/14/15/24/25,None,None,Weepinbell/Victreebel
+Weepinbell,70,None,None,12/13/14/15,None,12/13/14/15,Cerulean Cave,Bellsprout,Victreebel
+Victreebel,71,None,None,None,None,None,None,Bellsprout/Weepinbell,None
+Tentacool,72,12/13/17/18/19/20/21,Pallet Town/Viridian City,12/13/17/18/19/20/21,Pallet Town/Viridian City,11/13/17/18/19/20/21,Pallet Town/Seafoam Islands/Vermilion City,None,Tentacruel
+Tentacruel,73,None,None,None,None,19/20/21,None,Tentacool,None
+Geodude,74,None,Mt. Moon/Rock Tunnel/Victory Road,None,Mt. Moon/Rock Tunnel/Victory Road,None,Mt. Moon/Rock Tunnel/Victory Road,None,Graveler/Golem
+Graveler,75,None,Victory Road,None,Victory Road,None,Victory Road/Cerulean Cave,Geodude,Golem
+Golem,76,None,None,None,None,None,None,Geodude/Graveler,None
+Ponyta,77,None,Pokemon Mansion,None,Pokemon Mansion,17,None,None,Rapidash
+Rapidash,78,None,None,None,None,None,None,Ponyta,None
+Slowpoke,79,10,Celadon City/Seafoam Islands/Safari Zone,10,Celadon City/Seafoam Islands/Safari Zone,12/13,Seafoam Islands,None,Slowbro
+Slowbro,80,23,Cerulean Cave/Seafoam Islands,23,Cerulean Cave/Seafoam Islands,12/13,Seafoam Islands,Slowpoke,None
+Magnemtite,81,None,Power Plant,None,Power Plant,10,Power Plant,None,Magneton
+Magneton,82,None,Cerulean Cave/Power Plant,None,Cerulean Cave/Power Plant,None,Power Plant,Magnemite,None
+Farfetch'd,83,None,Vermilion City,None,Vermilion City,12/13,None,None,None
+Doduo,84,16/17/18,Safari Zone,16/17/18,Safari Zone,16/17/18,None,None,Dodrio
+Dodrio,85,None,Cerulean Cave,None,Cerulean Cave,17,None,Doduo,None
+Seel,86,None,Cinnabar Island/Seafoam Islands,None,Cinnabar Island/Seafoam Islands,None,Seafoam Islands,None,Dewgong
+Dewgong,87,None,Seafoam Islands,None,Seafoam Islands,None,Cinnabar Island/Seafoam Islands,Seel,None
+Grimer,88,None,Pokemon Mansion,None,Pokemon Mansion,None,Power Plant/Pokemon Mansion,None,Muk
+Muk,89,None,Pokemon Mansion,None,Pokemon Mansion,None,Cinabar Island/Power Plant/Pokemon Mansion,Grimer,None
+Shellder,90,6/11/19/20/21,Seafoam Islands/Vermilion City,6/11/19/20/21,Seafoam Islands/vermilion City,17/18,Vermilion City,None,Cloyster
+Cloyster,91,None,None,None,None,None,None,Shellder,None
+Gastly,92,None,Pokemon Tower,None,Pokemon Tower,None,Pokemon Tower,None,Haunter/Gengar
+Haunter,93,None,Pokemon Tower,None,Pokemon Tower,None,Pokemon Tower,Ghastly,Gengar
+Gengar,94,None,None,None,None,None,None,Ghastly/Haunter,None
+Onix,95,None,Rock Tunnel/Victory Road,None,Rock Tunnel/Victory Road,None,Rock Tunnel/Victory Road,None,None
+Drowzee,96,11,None,11,None,11,None,None,Hypno
+Hypno,97,None,Cerulean Cave,None,Cerulean Cave,None,None,Drowzee,None
+Krabby,98,6/11/12/13/17/18/24/25,Fuchsia City/Vermilion City/Safari Zone,6/11/12/13/17/18/24/25,Fuchsia City/Seafoam Islands/Vermilion City/Safari Zone,10/25,Seafoam Islands,None,Kingler
+Kingler,99,23,Cerulean Cave,23,Cerulean Cave/Seafoam Islands,10/25,Seafoam Islands,Krabby,None
+Voltorb,100,10,Power Plant,10,Power Plant,None,Power Plant,None,Electrode
+Electrode,101,None,Cerulean Cave/Cinnabar Island,None,Cerulean Cave/Cinnabar Island,None,None,Voltorb,None
+Exeggcute,102,None,Safari Zone,None,Safari Zone,None,Safari Zone,None,Exeggutor
+Exeggutor,103,None,None,None,None,None,None,Exeggcute,None
+Cubone,104,None,Pokemon Tower,None,Pokemon Tower,None,Pokemon Tower/Safari Zone,None,Marowak
+Marowak,105,None,Cerulean Cave/Victory Road,None,Cerulean Cave/Victory Road,None,Safari Zone,Cubone,None
+Hitmonlee,106,None,Saffron City,None,Saffron City,None,Saffron City,None,None
+Hitmonchan,107,None,Saffron City,None,Saffron City,None,Saffron City,None,None
+Lickitung,108,18,None,18,None,None,Cerulean Cave,None,None
+Koffing,109,None,Pokemon Mansion,None,Pokemon Mansion,None,None,None,Weezing
+Weezing,110,None,Pokemon Mansion,None,Pokemon Mansion,None,None,Koffing,None
+Rhyhorn,111,None,Safari Zone,None,Safari Zone,None,Cerulean Cave/Safari Zone,None,Rhydon
+Rhydon,112,None,Cerulean Cave,None,Cerulean Cave,None,Cerulean Cave/Cinnabar Island,Rhyhorn,None
+Chansey,113,None,Cerulean Cave/Safari Zone,None,Cerulean Cave/Safari Zone,None,Cerulean Cave/Safari Zone,None,None
+Tangela,114,21,Cinnabar Island,21,Cinnabar Island,None,Safari Zone,None,None
+Kangaskhan,115,None,Safari Zone,None,Safari Zone,None,Safari Zone,None,None
+Horsea,116,19/20/21,Seafoam Islands,19/20/21,Seafoam Islands,10/11/12/13,Vermilion City,None,Seadra
+Seadra,117,23,Cerulean Cave/Seafoam Islands,23,Cerulean Cave,12/13,None,Horsea,None
+Goldeen,118,6/10/11/12/13/17/18/19/20/21/22/23/24/25,Celadon City/Cerulean Cave/Fuchsia City/Pallet Town/Seafoam Islands/Vermilion City/Viridian City/Safari Zone,6/10/11/12/13/17/18/19/20/21/22/23/24/25,Celadon City/Cerulean Cave/Fuchsia City/Pallet Town/Seafoam Islands/Vermilion City/Viridian City/Safari Zone,6/10/11/12/13/17/18/19/20/21/22/23/24/25,Celadon City/Cerulean Cave/Fuchsia City/Pallet Town/Seafoam Islands/Vermilion City/Viridian City/Safari Zone,None,Seaking
+Seaking,119,23,Cerulean Cave/Fuchsia City,23,Cerulean Cave/Fuchsia City,24,Cerulean Cave,Goldeen,None
+Staryu,120,19/20/21,Seafoam Islands,19/20/21,Seafoam Islands,19/20/21,Pallet Town/Seafoam Islands/Vermilion City,None,Starmie
+Starmie,121,None,None,None,None,None,None,Staryu,None
+Mr. Mime,122,2,None,2,None,2,None,None,None
+Scyther,123,None,Celadon City/Safari Zone,None,None,None,Celadon City/Safari Zone,None,None
+Jynx,124,None,Cerulean City,None,Cerulean City,None,None,None,None
+Electabuzz,125,None,Power Plant,None,None,None,None,None,None
+Magmar,126,None,None,None,Pokemon Mansion,None,None,None,None
+Pinsir,127,None,None,None,Celadon City/Safari Zone,None,Celadon City/Safari Zone,None,None
+Tauros,128,None,Safari Zone,None,Safari Zone,None,Safari Zone,None,None
+Magikarp,129,4/6/10/11/12/13/17/18/19/20/21/22/23/24/25,Celadon City/Cerulean Cave/Fuchsia City/Pallet Town/Seafoam Islands/Vermilion City/Viridian City/Safari Zone,4/6/10/11/12/13/17/18/19/20/21/22/23/24/25,Celadon City/Cerulean Cave/Fuchsia City/Pallet Town/Seafoam Islands/Vermilion City/Viridian City/Safari Zone,4/6/10/11/12/13/17/18/19/20/21/22/23/24/25,Celadon City/Cerulean Cave/Fuchsia City/Pallet Town/Seafoam Islands/Vermilion City/Viridian City/Safari Zone,None,Gyarados
+Gyarados,130,None,None,None,None,None,Fuchsia City,Magikarp,None
+Lapras,131,None,Silph Co.,None,Silph Co.,None,Silph Co.,None,None
+Ditto,132,13/14/15/23,Cerulean Cave,13/14/15/23,Cerulean Cave,None,Cerulean Cave/Pokemon Mansion,None,None
+Eevee,133,None,Celadon City,None,Celadon City,None,Celadon City,None,Vaporeon/Jolteon/Flareon
+Vaporeon,134,None,None,None,None,None,None,Eevee,None
+Jolteon,135,None,None,None,None,None,None,Eevee,None
+Flareon,136,None,None,None,None,None,None,Eevee,None
+Porygon,137,None,Celadon City,None,Celadon City,None,Celadon City,None,None
+Omanyte,138,None,Cinnabar Island,None,Cinnabar Island,None,Cinnabar Island,None,Omastar
+Omastar,139,None,None,None,None,None,None,None,Omanyte
+Kabuto,140,None,Cinnabar Island,None,Cinnabar Island,None,Cinnabar Island,None,Kabutops
+Kabutops,141,None,None,None,None,None,None,None,Kabuto
+Aerodactyl,142,None,Cinnabar Island,None,Cinnabar Island,None,Cinnabar Island,None,None
+Snorlax,143,12/16,None,12/16,None,12/16,None,None,None
+Articuno,144,None,Seafoam Islands,None,Seafoam Islands,None,Seafoam Islands,None,None
+Zapdos,145,None,Power Plant,None,Power Plant,None,Power Plant,None,None
+Moltres,146,None,Victory Road,None,Victory Road,None,Victory Road,None,None
+Dratini,147,None,Celadon City/Safari Zone,None,Celadon City/Safari Zone,None,Safari Zone,None,Dragonair/Dragonite
+Dragonair,148,None,None,None,None,None,Safari Zone,Dratini,Dragonite
+Dragonite,149,None,None,None,None,None,None,Dratini/Dragonair,None
+Mewtwo,150,None,Cerulean Cave,None,Cerulean Cave,None,Cerulean Cave,None,None
+Mew,151,None,None,None,None,None,None,None,None
