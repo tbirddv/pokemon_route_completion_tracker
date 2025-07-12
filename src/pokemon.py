@@ -4,14 +4,45 @@ class Pokemon:
         self.id = id
         self.status = status
 
+    def to_dict(self):
+        return {
+            'name': self.name,
+            'id': self.id,
+            'status': self.status
+        }
+
 class Local_Gen1(Pokemon):
-    def __init__(self, name, id, red_routes, red_uniques, blue_routes, blue_uniques, yellow_routes, yellow_uniques, devolutions, evolutions):
-        super().__init__(name, id)
-        self.red_locations = [f"Route {route.strip()}" for route in red_routes.strip().split('/') if route.strip() != '' and route.strip().lower() != "none"] + [unique.strip() for unique in red_uniques.strip().split('/') if unique.strip() != '' and unique.strip().lower() != "none"]
-        self.blue_locations = [f"Route {route.strip()}" for route in blue_routes.strip().split('/') if route.strip() != '' and route.strip().lower() != "none"] + [unique.strip() for unique in blue_uniques.strip().split('/') if unique.strip() != '' and unique.strip().lower() != "none"]
-        self.yellow_locations = [f"Route {route.strip()}" for route in yellow_routes.strip().split('/') if route.strip() != '' and route.strip().lower() != "none"] + [unique.strip() for unique in yellow_uniques.strip().split('/') if unique.strip() != '' and unique.strip().lower() != "none"]
-        self.devolutions = [pokemon.strip() for pokemon in devolutions.strip().split('/') if pokemon.strip() != '' and pokemon.strip().lower() != "none"]
-        self.evolutions = [pokemon.strip() for pokemon in evolutions.strip().split('/') if pokemon.strip() != '' and pokemon.strip().lower() != "none"]
+    def __init__(self, name, id, red_locations, blue_locations, yellow_locations, devolutions, evolutions, status="Uncaught"):
+        super().__init__(name, id, status)
+        self.red_locations = red_locations
+        self.blue_locations = blue_locations
+        self.yellow_locations = yellow_locations
+        self.devolutions = devolutions
+        self.evolutions = evolutions
+    
+    @classmethod
+    def from_csv(cls, row):
+        name = row['Name']
+        id = int(row['ID'])
+        red_locations = [f"Route {route.strip()}" for route in row['Red Routes'].strip().split('/') if route.strip() != '' and route.strip().lower() != "none"] + [unique.strip() for unique in row['Red Uniques'].strip().split('/') if unique.strip() != '' and unique.strip().lower() != "none"]
+        blue_locations = [f"Route {route.strip()}" for route in row['Blue Routes'].strip().split('/') if route.strip() != '' and route.strip().lower() != "none"] + [unique.strip() for unique in row['Blue Uniques'].strip().split('/') if unique.strip() != '' and unique.strip().lower() != "none"]
+        yellow_locations = [f"Route {route.strip()}" for route in row['Yellow Routes'].strip().split('/') if route.strip() != '' and route.strip().lower() != "none"] + [unique.strip() for unique in row['Yellow Uniques'].strip().split('/') if unique.strip() != '' and unique.strip().lower() != "none"]
+        devolutions = [pokemon.strip() for pokemon in row['Devolutions'].strip().split('/') if pokemon.strip() != '' and pokemon.strip().lower() != "none"]
+        evolutions = [pokemon.strip() for pokemon in row['Evolutions'].strip().split('/') if pokemon.strip() != '' and pokemon.strip().lower() != "none"]
+        return cls(name, id, red_locations, blue_locations, yellow_locations, devolutions, evolutions)
+    
+    @classmethod
+    def from_dict(cls, data):
+        return cls(
+            name=data['name'],
+            id=data['id'],
+            red_locations=data.get('red_locations', []),
+            blue_locations=data.get('blue_locations', []),
+            yellow_locations=data.get('yellow_locations', []),
+            devolutions=data.get('devolutions', []),
+            evolutions=data.get('evolutions', []),
+            status=data.get('status', 'Uncaught')
+        )
 
 
     def __repr__(self):
@@ -29,3 +60,14 @@ class Local_Gen1(Pokemon):
             lines.append(f"Evolutions: {self.evolutions}")
         
         return ",\n".join(lines)
+    
+    def to_dict(self):
+        base_dict = super().to_dict()
+        base_dict.update({
+            'red_locations': self.red_locations,
+            'blue_locations': self.blue_locations,
+            'yellow_locations': self.yellow_locations,
+            'devolutions': self.devolutions,
+            'evolutions': self.evolutions
+        })
+        return base_dict

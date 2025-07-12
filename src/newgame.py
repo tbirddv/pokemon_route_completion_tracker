@@ -1,17 +1,12 @@
-import os
 import csv
 import json
 from pathlib import Path
-from src.pokemon import Local_Gen1
-from src.location import Gen1Location
+from src.pokemon import Local_Gen1, Pokemon
+from src.location import Gen1Location, Location
+from src.utils import get_game_enum
 from Data.constants import SupportedGames, Generation_1
 
-def get_game_enum(game_name):
-    game_name = game_name.strip().upper()
-    try:
-        return SupportedGames[game_name]
-    except KeyError:
-        raise ValueError(f"Unsupported game name: {game_name}. Please see readme for currently supported games.")
+
     
 def delete_game_save(game):
     if not isinstance(game, SupportedGames):
@@ -63,18 +58,7 @@ def new_game(game_name, overwrite=False, cli_mode=False):
         with open(pokemon_path, mode='r', encoding='utf-8') as pokemon_file:
             pokemon_reader = csv.DictReader(pokemon_file)
             for row in pokemon_reader:
-                pokemon = Local_Gen1(
-                    name=row['Name'],
-                    id=int(row['ID']),
-                    red_routes=row['Red Routes'],
-                    red_uniques=row['Red Uniques'],
-                    blue_routes=row['Blue Routes'],
-                    blue_uniques=row['Blue Uniques'],
-                    yellow_routes=row['Yellow Routes'],
-                    yellow_uniques=row['Yellow Uniques'],
-                    devolutions=row['Devolutions'],
-                    evolutions=row['Evolutions']
-                )
+                pokemon = Local_Gen1.from_csv(row)
                 pokemon_list.append(pokemon)
         with open(location_path, mode='r', encoding='utf-8') as location_file:
             location_reader = csv.DictReader(location_file)
@@ -84,27 +68,15 @@ def new_game(game_name, overwrite=False, cli_mode=False):
                     unavailable = [p.strip() for p in raw_unavailable_str.split('/') if p.strip() and p.strip().lower() != 'none']
                     unavailable_pokemon.extend(unavailable)
                     continue
-                location = Gen1Location(
-                    name=row['Area Name'],
-                    red_walking=row['Red Walking'],
-                    red_surfing=row['Red Surfing'],
-                    red_fishing=row['Red Fishing'],
-                    red_other=row['Red Other'],
-                    blue_walking=row['Blue Walking'],
-                    blue_surfing=row['Blue Surfing'],
-                    blue_fishing=row['Blue Fishing'],
-                    blue_other=row['Blue Other'],
-                    yellow_walking=row['Yellow Walking'],
-                    yellow_surfing=row['Yellow Surfing'],
-                    yellow_fishing=row['Yellow Fishing'],
-                    yellow_other=row['Yellow Other']
-                )
+                location = Gen1Location.from_csv(row)
                 location_list.append(location)
         # Save initial game state
         initial_save = {
-            'game': game.value,
-            'pokemon': [vars(p) for p in pokemon_list],
-            'locations': [vars(l) for l in location_list],
+            'settings': {
+                'game': game.value
+            },
+            'pokemon': [p.to_dict() for p in pokemon_list],
+            'locations': [l.to_dict() for l in location_list],
             'unavailable_pokemon': unavailable_pokemon
         }
         with open(save_file_path, 'w', encoding='utf-8') as save_file:
