@@ -73,7 +73,7 @@ def new_game(game_name, overwrite=False, cli_mode=False):
             for row in location_reader:
                 if row['Area Name'].strip().lower() == 'unavailable':
                     raw_unavailable_str = row.get(f"{game.value} Walking", "")
-                    unavailable = [p.strip() for p in raw_unavailable_str.split('/') if p.strip() and p.strip().lower() != 'none']
+                    unavailable = [p.strip().lower() for p in raw_unavailable_str.split('/') if p.strip() and p.strip().lower() != 'none']
                     unavailable_pokemon.extend(unavailable)
                     continue
                 location = Gen1Location.from_csv(row)
@@ -85,7 +85,8 @@ def new_game(game_name, overwrite=False, cli_mode=False):
             },
             'pokemon': [p.to_dict() for p in pokemon_list],
             'locations': [l.to_dict() for l in location_list],
-            'unavailable_pokemon': unavailable_pokemon
+            'unavailable_pokemon': unavailable_pokemon,
+            'remaining_unavailable_pokemon': unavailable_pokemon.copy()
         }
         with open(save_file_path, 'w', encoding='utf-8') as save_file:
             json.dump(initial_save, save_file, indent=4)

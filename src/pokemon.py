@@ -1,3 +1,5 @@
+from Data.constants import SupportedGames
+
 class Pokemon:
     def __init__(self, name, id, status="Uncaught"):
         self.name = name
@@ -22,13 +24,13 @@ class Local_Gen1(Pokemon):
     
     @classmethod
     def from_csv(cls, row):
-        name = row['Name']
+        name = row['Name'].lower()
         id = int(row['ID'])
         red_locations = [f"Route {route.strip()}" for route in row['Red Routes'].strip().split('/') if route.strip() != '' and route.strip().lower() != "none"] + [unique.strip() for unique in row['Red Uniques'].strip().split('/') if unique.strip() != '' and unique.strip().lower() != "none"]
         blue_locations = [f"Route {route.strip()}" for route in row['Blue Routes'].strip().split('/') if route.strip() != '' and route.strip().lower() != "none"] + [unique.strip() for unique in row['Blue Uniques'].strip().split('/') if unique.strip() != '' and unique.strip().lower() != "none"]
         yellow_locations = [f"Route {route.strip()}" for route in row['Yellow Routes'].strip().split('/') if route.strip() != '' and route.strip().lower() != "none"] + [unique.strip() for unique in row['Yellow Uniques'].strip().split('/') if unique.strip() != '' and unique.strip().lower() != "none"]
-        devolutions = [pokemon.strip() for pokemon in row['Devolutions'].strip().split('/') if pokemon.strip() != '' and pokemon.strip().lower() != "none"]
-        evolutions = [pokemon.strip() for pokemon in row['Evolutions'].strip().split('/') if pokemon.strip() != '' and pokemon.strip().lower() != "none"]
+        devolutions = [pokemon.strip().lower() for pokemon in row['Devolutions'].strip().split('/') if pokemon.strip() != '' and pokemon.strip().lower() != "none"]
+        evolutions = [pokemon.strip().lower() for pokemon in row['Evolutions'].strip().split('/') if pokemon.strip() != '' and pokemon.strip().lower() != "none"]
         return cls(name, id, red_locations, blue_locations, yellow_locations, devolutions, evolutions)
     
     @classmethod
@@ -43,6 +45,13 @@ class Local_Gen1(Pokemon):
             evolutions=data.get('evolutions', []),
             status=data.get('status', 'Uncaught')
         )
+    
+    def locations_fields(self):
+        return {
+            SupportedGames.RED: self.red_locations,
+            SupportedGames.BLUE: self.blue_locations,
+            SupportedGames.YELLOW: self.yellow_locations
+        }
 
 
     def __repr__(self):

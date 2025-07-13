@@ -9,7 +9,7 @@ from src.location import Location, Gen1Location
 
 @dataclass
 class GameSettings:
-    game: SupportedGames
+    game: SupportedGames  # Default to False if not specified
 
     @classmethod
     def from_dict(cls, data):
@@ -18,13 +18,15 @@ class GameSettings:
     
     def to_dict(self):
         return {
-            'game': self.game.value
-        }
+            'game': self.game.value,
+            }
+    
 @dataclass
 class SaveData:
     pokemon: list[Pokemon]
     locations: list[Location]
     unavailable_pokemon: list[str]
+    remaining_unavailable_pokemon: list[str] = None
     settings: GameSettings = None
 
     @classmethod
@@ -33,6 +35,7 @@ class SaveData:
         pokemon_data = data.get('pokemon', [])
         location_data = data.get('locations', [])
         unavailable_pokemon = data.get('unavailable_pokemon', [])
+        remaining_unavailable_pokemon = data.get('remaining_unavailable_pokemon', [])
 
         if settings.game in Generation_1:
             pokemon_list = [Local_Gen1.from_dict(p) for p in pokemon_data]
@@ -45,7 +48,8 @@ class SaveData:
             settings=settings,
             pokemon=pokemon_list,
             locations=location_list,
-            unavailable_pokemon=unavailable_pokemon
+            unavailable_pokemon=unavailable_pokemon,
+            remaining_unavailable_pokemon=remaining_unavailable_pokemon
         )
     
     def to_dict(self):
@@ -53,21 +57,25 @@ class SaveData:
             'settings': self.settings.to_dict() if self.settings else None,
             'pokemon': [p.to_dict() for p in self.pokemon],
             'locations': [l.to_dict() for l in self.locations],
-            'unavailable_pokemon': self.unavailable_pokemon
+            'unavailable_pokemon': self.unavailable_pokemon,
+            'remaining_unavailable_pokemon': self.remaining_unavailable_pokemon
         }
 
 @dataclass
 class AppConfig:
     tracked_game: SupportedGames = None
+    companion_tracker: bool = False  # Whether to track companion games in area reports
 
     @classmethod
     def from_dict(cls, data):
         tracked_game = SupportedGames(data['tracked_game']) if 'tracked_game' in data and data['tracked_game'] else None
-        return cls(tracked_game=tracked_game)
+        companion_tracker = data.get('companion_tracker', False)
+        return cls(tracked_game=tracked_game, companion_tracker=companion_tracker)
     
     def to_dict(self):
         return {
-            'tracked_game': self.tracked_game.value if self.tracked_game else None
+            'tracked_game': self.tracked_game.value if self.tracked_game else None,
+            'companion_tracker': self.companion_tracker
         }
 
 def get_game_enum(game_name):
@@ -133,16 +141,16 @@ def load_app_config():
     if not config_path.exists():
         config_path.parent.mkdir(parents=True, exist_ok=True)
         with open(config_path, 'w', encoding='utf-8') as config_file:
-            json.dump({'tracked_game': None}, config_file, indent=4)
-        return AppConfig(tracked_game=None)
+            json.dump({'tracked_game': None, 'companion_tracker': False}, config_file, indent=4)
+        return AppConfig(tracked_game=None, companion_tracker=False)
     try:
         with open(config_path, 'r', encoding='utf-8') as config_file:
             return AppConfig.from_dict(json.load(config_file))
     except (json.JSONDecodeError, KeyError, ValueError) as e:
         print(f"Error loading config file: {e}. Resetting to default configuration.")
         with open(config_path, 'w', encoding='utf-8') as config_file:
-            json.dump({'tracked_game': None}, config_file, indent=4)
-        return AppConfig(tracked_game=None)
+            json.dump({'tracked_game': None, 'companion_tracker': False}, config_file, indent=4)
+        return AppConfig(tracked_game=None, companion_tracker=False)
     except OSError as e:
         print(f"Error accessing config file: {e}. Please ensure the .pokemon_tracker directory is accessible.")
         sys.exit(1)
