@@ -1,4 +1,4 @@
-from utils import (get_game_enum, SaveData, save_game_data, load_save_file)
+from src.utils import (get_game_enum, SaveData, save_game_data, load_save_file)
 from Data.constants import SupportedGames, Generation_1
 from src.pokemon import Pokemon, Local_Gen1
 from src.location import Location, Gen1Location

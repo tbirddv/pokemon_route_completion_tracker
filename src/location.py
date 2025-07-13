@@ -1,4 +1,5 @@
 import copy
+from Data.constants import SupportedGames
 
 class Location:
     def __init__(self, name, caught = None):
@@ -257,6 +258,31 @@ class Gen1Location(Location):
                         if pokemon_name in encounter_type_const[sub_location][subtype] and pokemon_name not in encounter_type_uncaught[sub_location][subtype]:
                             encounter_type_uncaught[sub_location][subtype].append(pokemon_name)
 
+    def uncaught_fields(self):
+        return {
+            SupportedGames.RED: {
+                'Walking': self.red_walking_uncaught,
+                'Surfing': self.red_surfing_uncaught,
+                'Fishing': self.red_fishing_uncaught,
+                'Other': self.red_other_uncaught
+            },
+            SupportedGames.BLUE: {
+                'Walking': self.blue_walking_uncaught,
+                'Surfing': self.blue_surfing_uncaught,
+                'Fishing': self.blue_fishing_uncaught,
+                'Other': self.blue_other_uncaught
+            },
+            SupportedGames.YELLOW: {
+                'Walking': self.yellow_walking_uncaught,
+                'Surfing': self.yellow_surfing_uncaught,
+                'Fishing': self.yellow_fishing_uncaught,
+                'Other': self.yellow_other_uncaught
+            }
+        }
+        
+
+    
+    
     def to_dict(self):
         base_dict = super().to_dict()
         base_dict.update({
