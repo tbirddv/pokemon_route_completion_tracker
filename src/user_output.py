@@ -2,6 +2,35 @@ from src.utils import (get_game_enum, SaveData, save_game_data, load_save_file)
 from Data.constants import SupportedGames, Generation_1
 from src.pokemon import Local_Gen1, Pokemon
 from src.location import Gen1Location, Location
+import shutil
+import math
+
+def format_list_for_output(items, indent_level, max_width):
+    if not items:
+        return ""
+    
+    title_items = [item.title() for item in items]
+    lines = []
+    current_line = " " * indent_level
+    for item in title_items:
+        if len(current_line) + len(item) + 2 > max_width and len(current_line) > indent_level:
+            lines.append(current_line.rstrip(", "))
+            current_line = " " * indent_level + item
+        else:
+            if current_line == " " * indent_level:
+                current_line += item
+            else:
+                item_with_comma = ", " + item
+                current_line += item_with_comma
+    lines.append(current_line.rstrip(", "))
+    return "\n".join(lines)
+
+def get_terminal_width(default=80):
+    try:
+        width = shutil.get_terminal_size().columns
+        return width if width > 0 else default
+    except Exception:
+        return default
 
 def simple_area_report(game_name, area_name):
     game = get_game_enum(game_name)
@@ -232,3 +261,60 @@ def basic_individual_pokemon_report(game_name, pokemon_name, location=False, com
                 print(f"  {game_in_gen.value}: {', '.join(sorted([loc.title() for loc in locs]))}")
             else:
                 print(f"  {game_in_gen.value}: Not found in any locations in this game.")
+
+
+def simple_completion_report(game_name):
+    game = get_game_enum(game_name)
+    save_data = load_save_file(game.value)
+    total_pokemon = len(save_data.pokemon)
+    caught_count = 0
+    for pokemon in save_data.pokemon:
+        if pokemon.status == 'Caught':
+            caught_count += 1
+    print(f"Total Pokemon: {total_pokemon}")
+    print(f"Caught Pokemon: {caught_count}")
+    print(f"Uncaught Pokemon: {total_pokemon - caught_count}")
+    print(f"Your Pokedex is {caught_count / total_pokemon * 100:.2f}% complete.")
+
+def detailed_completion_report(game_name, companion=False):
+    game = get_game_enum(game_name)
+    save_data = load_save_file(game.value)
+    
+    terminal_width = get_terminal_width(default=80)
+    
+    caught_pokemon = [p for p in save_data.pokemon if p.status == 'Caught']
+    if companion:
+        uncaught_pokemon = [p for p in save_data.pokemon if p.status != 'Caught' and p.name not in save_data.unavailable_pokemon]
+        unavailable_pokemon = [p for p in save_data.remaining_unavailable_pokemon]
+    else:
+        uncaught_pokemon = [p for p in save_data.pokemon if p.status != 'Caught']
+        unavailable_pokemon = []
+    
+    total_pokemon = len(save_data.pokemon)
+    caught_count = len(caught_pokemon)
+    uncaught_count = len(uncaught_pokemon)
+
+    print(f"Total Pokemon: {total_pokemon}")
+    print(f"Caught Pokemon: {caught_count}")
+    print(f"Uncaught Pokemon: {uncaught_count}")
+    print(f"Your Pokedex is {caught_count / total_pokemon * 100:.2f}% complete.")
+    print()
+    print("Caught Pokemon:")
+    if caught_pokemon:
+        formated_caught = format_list_for_output([p.name for p in caught_pokemon], indent_level=2, max_width=terminal_width)
+        print(formated_caught)
+    else:
+        print("  None")
+    print()
+    if uncaught_pokemon:
+        print("Uncaught Pokemon:")
+        formated_uncaught = format_list_for_output([p.name for p in uncaught_pokemon], indent_level=2, max_width=terminal_width)
+        print(formated_uncaught)
+    else:
+        print("All Pokemon have been caught! Congratulations!")
+    print()
+    if unavailable_pokemon:
+        print("Uncaught pokemon not available in this game (e.g., version exclusives, event-only):")
+        formated_unavailable = format_list_for_output(unavailable_pokemon, indent_level=2, max_width=terminal_width)
+        print(formated_unavailable)
+    print()

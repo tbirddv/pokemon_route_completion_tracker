@@ -4,7 +4,7 @@ from src.utils import get_game_enum, SaveData, save_game_data, load_save_file, c
 from Data.constants import SupportedGames
 from src.newgame import new_game, delete_game_save
 from src.game_status_update import catch_pokemon, reset_pokemon_status
-from src.user_output import detailed_area_report, simple_area_report, basic_individual_pokemon_report
+from src.user_output import detailed_area_report, simple_area_report, basic_individual_pokemon_report, simple_completion_report, detailed_completion_report
 
 def main():
     parser = argparse.ArgumentParser(
@@ -53,6 +53,10 @@ def main():
     pokemon_report_parser.add_argument('pokemon_name', type=str, help='Name of the Pokemon to generate report for')
     pokemon_report_parser.add_argument('-l', '--locations', action='store_true', help='Include location details in the report')
     pokemon_report_parser.set_defaults(func=handle_pokemon_report)
+
+    completion_report_parser = subparsers.add_parser('completion', help='Generate a completion report for the tracked game')
+    completion_report_parser.add_argument('-d', '--detailed', action='store_true', help='Generate a detailed completion report (caught, uncaught, and unavailable)')
+    completion_report_parser.set_defaults(func=handle_completion_report)
 
     args = parser.parse_args()
 
@@ -134,6 +138,16 @@ def handle_pokemon_report(args):
         print("Please specify a Pokemon name for the report.")
         return
     basic_individual_pokemon_report(config.tracked_game.value, args.pokemon_name, location=args.locations, companions=config.companion_tracker)
+
+def handle_completion_report(args):
+    config = load_app_config()
+    if config.tracked_game is None:
+        print("No game currently being tracked. Please set a game using the 'change' command.")
+        return
+    if args.detailed:
+        detailed_completion_report(config.tracked_game.value, companion=config.companion_tracker)
+    else:
+        simple_completion_report(config.tracked_game.value)
 
 if __name__ == "__main__":
     main()
