@@ -6,3 +6,7 @@ class SupportedGames(Enum):
     YELLOW = 'Yellow'
 
 Generation_1 = [SupportedGames.RED, SupportedGames.BLUE, SupportedGames.YELLOW]
+
+complex_evolutions = {
+    'gen_1': ['eevee']
+}

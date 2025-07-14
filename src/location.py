@@ -1,15 +1,27 @@
 import copy
+from enum import Enum
 from Data.constants import SupportedGames
 
+class ModificationType(Enum):
+    CATCH = 'catch'
+    EVOLVABLE = 'evolvable'
+    DEVOLVABLE = 'devolvable'
+    EVOLVE = 'evolve'
+    DEVOLVE = 'devolve'
+
 class Location:
-    def __init__(self, name, caught = None):
+    def __init__(self, name, caught = None, evolvable = None, devolvable = None):
         self.name = name
         self.caught = set(caught) if caught is not None else set()
+        self.evolvable = set(evolvable) if evolvable is not None else set()
+        self.devolvable = set(devolvable) if devolvable is not None else set()
 
     def to_dict(self):
         return {
             'name': self.name,
-            'caught': list(self.caught)
+            'caught': list(self.caught),
+            'evolvable': list(self.evolvable),
+            'devolvable': list(self.devolvable)
         }
 
 class Gen1Location(Location):
@@ -27,8 +39,9 @@ class Gen1Location(Location):
                  yellow_walking_const, yellow_walking_uncaught,
                  yellow_surfing_const, yellow_surfing_uncaught,
                  yellow_fishing_const, yellow_fishing_uncaught,
-                 yellow_other_const, yellow_other_uncaught, caught = None):
-        super().__init__(name, caught)
+                 yellow_other_const, yellow_other_uncaught,
+                 caught = None, evolvable = None, devolvable = None):
+        super().__init__(name, caught, evolvable, devolvable)
         self.red_all_const = red_all_const
         self.red_all_uncaught = red_all_uncaught
         self.red_walking_const = red_walking_const
@@ -257,22 +270,65 @@ class Gen1Location(Location):
             yellow_fishing_uncaught=data.get('yellow_fishing_uncaught', {}),
             yellow_other_const=data.get('yellow_other_const', {}),
             yellow_other_uncaught=data.get('yellow_other_uncaught', {}),
-            caught=data.get('caught', [])
+            caught=data.get('caught', []),
+            evolvable=data.get('evolvable', []),
+            devolvable=data.get('devolvable', [])
         )
     
-    def mark_pokemon_caught_in_area(self, pokemon_name: str):
+    def update_pokemon_status_in_area(self, pokemon_name: str, modification_type: ModificationType = ModificationType.CATCH):
+        """
+        This method is only intended to handle marking a pokemon as caught in a specific area.
+        If the game is tracking evolutions or devolutions this method will place eligible pokemon in the appropriate set, and remove them from other sets as appropriate.
+        If the pokemon is not available in this area (i.e., not in any of the encounter lists for this area), this method will do nothing.
+        If the pokemon is already marked as caught in this area, this method will do nothing.
+        Arguments:
+            pokemon_name: Name of the pokemon to mark as caught in this area.
+            modification_type: Type of modification to make. Default is CATCH, but can be any appropriate type. For purposes of this method only CATCH, EVOLVE, and DEVOLVE are equivalent.
+
+        Returns:
+            None
+        """
         pokemon_name = pokemon_name.lower()
         if pokemon_name in self.caught: #This check should always be false, but is here for safety
             return
         pokemon_available_in_area = False
-        for encounter_type in [self.red_all_uncaught, self.blue_all_uncaught, self.yellow_all_uncaught]:
+        #Changed check to use the "const" lists, which are the full lists of pokemon available in this area, rather than the "uncaught" lists, which may be incomplete if the user has already caught some pokemon in this area
+        #This ensures that if a user tries to mark a pokemon as caught in an area where it is not available, nothing will happen
+        #This is important for ensuring that evolutions and devolutions are only tracked in areas where the pokemon is actually available
+        #For example, if a user catches a Pikachu in Viridian Forest, then evolves it to Raichu, the Raichu should not be marked as caught in Viridian Forest
+        #Similarly, if a user breeds a Pichu from a Pikachu, Pichu should not be marked as caught in Viridian Forest
+        for encounter_type in [self.red_all_const, self.blue_all_const, self.yellow_all_const]:
             if not isinstance(encounter_type, list):
                 continue
             if pokemon_name in encounter_type:
                 pokemon_available_in_area = True
-                encounter_type.remove(pokemon_name)
         if pokemon_available_in_area:
-            self.caught.add(pokemon_name)
+            #This check will be used for catching a pokemon, receiving a new pokemon via evolution, or gaining a new pokemon via breeding
+            #In all these cases, the pokemon is considered "caught" in this area, and should be removed from uncaught lists
+            if modification_type in [ModificationType.CATCH, ModificationType.EVOLVE, ModificationType.DEVOLVE]:
+                self.caught.add(pokemon_name)
+                if pokemon_name in self.evolvable:
+                    self.evolvable.remove(pokemon_name)
+                if pokemon_name in self.devolvable:
+                    self.devolvable.remove(pokemon_name)
+            #This check is used for marking a pokemon as eligible to get from evolution
+            #In this case, the pokemon is not considered "caught" in this area, but is considered "evolvable"
+            #So it is added to the evolvable set, and removed from the uncaught lists if tracked there. Needed for tracking evolutions properly
+            #Note that pokemon will only appear if they are available to be caught in this area
+            if modification_type == ModificationType.EVOLVABLE:
+                self.evolvable.add(pokemon_name)
+            #This check is used for marking a pokemon as eligible to get from devolution (e.g. breeding a baby pokemon)
+            #In this case, the pokemon is not considered "caught" in this area, but is considered "devolvable"
+            #So it is added to the devolvable set, and removed from the uncaught lists if tracked there. Needed for tracking devolutions properly
+            #Note that pokemon will only appear if they are available to be caught in this area
+            if modification_type == ModificationType.DEVOLVABLE:
+                self.devolvable.add(pokemon_name)
+            for encounter_type in [self.red_all_uncaught, self.blue_all_uncaught, self.yellow_all_uncaught]:
+                if not isinstance(encounter_type, list):
+                    continue
+                if pokemon_name in encounter_type:
+                    encounter_type.remove(pokemon_name)
+            #Walking and Surfing encounters are stored as dicts of sublocations to lists of pokemon
             for encounter_type in [self.red_walking_uncaught, self.red_surfing_uncaught, self.blue_walking_uncaught, self.blue_surfing_uncaught, 
                                    self.yellow_walking_uncaught, self.yellow_surfing_uncaught]:
                 if not isinstance(encounter_type, dict):
@@ -280,6 +336,7 @@ class Gen1Location(Location):
                 for sub_location in encounter_type:
                     if isinstance(encounter_type[sub_location], list) and pokemon_name in encounter_type[sub_location]:
                         encounter_type[sub_location].remove(pokemon_name)
+            #Fishing and Other encounters are stored as dicts of sublocations to dicts of subtypes to lists of pokemon
             for encounter_type in [self.red_fishing_uncaught, self.red_other_uncaught, self.blue_fishing_uncaught, self.blue_other_uncaught,
                                    self.yellow_fishing_uncaught, self.yellow_other_uncaught]:
                 if not isinstance(encounter_type, dict):
@@ -292,9 +349,28 @@ class Gen1Location(Location):
             
 
     def reset_pokemon_status_in_area(self, pokemon_name: str):
+        """
+        This method is a hard reset of all pokemon data in an area. It does not allow for modification of selected fields.
+        It is intended to be used when a user wants to "uncatch" a pokemon in an area, for example if they made a mistake or want to re-catch a pokemon.
+        It will remove the pokemon from the caught, evolvable, and devolvable sets, and add it back to all appropriate uncaught lists if it is available in this area.
+        Arguments:
+            pokemon_name: Name of the pokemon to reset in this area.
+        Returns:
+            None
+        """
         pokemon_name = pokemon_name.lower()
         if pokemon_name in self.caught:
             self.caught.remove(pokemon_name)
+        if pokemon_name in self.evolvable:
+            self.evolvable.remove(pokemon_name)
+        if pokemon_name in self.devolvable:
+            self.devolvable.remove(pokemon_name)
+        #Now we need to add the pokemon back to all appropriate uncaught lists if it is available in this area
+        #We will use the "const" lists to determine if the pokemon is available in this area
+        #If it is, we will add it back to the appropriate uncaught lists if it is not already present there
+        #This ensures that if a user resets a pokemon that was never caught in this area, it will not be added to the uncaught lists
+        
+        #All encounter types are summarized here for simplicity, they should be lists of pokemon available in this area
         for encounter_type_uncaught, encounter_type_const in [(self.red_all_uncaught, self.red_all_const),
                                                               (self.blue_all_uncaught, self.blue_all_const),
                                                               (self.yellow_all_uncaught, self.yellow_all_const)]:
@@ -302,6 +378,7 @@ class Gen1Location(Location):
                 continue
             if pokemon_name in encounter_type_const and pokemon_name not in encounter_type_uncaught:
                 encounter_type_uncaught.append(pokemon_name)
+        #Walking and Surfing encounters are stored as dicts of sublocations to lists of pokemon
         for encounter_type_uncaught, encounter_type_const in [(self.red_walking_uncaught, self.red_walking_const),
                                                               (self.red_surfing_uncaught, self.red_surfing_const),
                                                               (self.blue_walking_uncaught, self.blue_walking_const),
@@ -316,6 +393,7 @@ class Gen1Location(Location):
                         encounter_type_uncaught[sub_location] = encounter_type_const[sub_location].copy()
                     if pokemon_name in encounter_type_const[sub_location] and pokemon_name not in encounter_type_uncaught[sub_location]:
                         encounter_type_uncaught[sub_location].append(pokemon_name)
+        #Fishing and Other encounters are stored as dicts of sublocations to dicts of subtypes to lists of pokemon
         for encounter_type_uncaught, encounter_type_const in [(self.red_fishing_uncaught, self.red_fishing_const),
                                                               (self.red_other_uncaught, self.red_other_const),
                                                               (self.blue_fishing_uncaught, self.blue_fishing_const),
@@ -340,6 +418,12 @@ class Gen1Location(Location):
                         encounter_type_uncaught[sub_location].append(pokemon_name)
 
     def uncaught_fields(self):
+        """
+        Returns a dictionary of uncaught pokemon lists for each game and encounter type.
+        Needed here since it will be unique to each generation.
+        The structure is:
+        SupporedGame -> Encounter Type Field
+        """
         return {
             SupportedGames.RED: {
                 'All': self.red_all_uncaught,
@@ -363,22 +447,6 @@ class Gen1Location(Location):
                 'Other': self.yellow_other_uncaught
             }
         }
-    
-    def pokemon_details(self, game: SupportedGames, pokemon_name: str):
-        pokemon_name = pokemon_name.lower()
-        fields_to_check = self.uncaught_fields[game]
-        encounter_data = {}
-        for encounter_type, data in fields_to_check.items():
-            if encounter_type == "Walking" or encounter_type == "Surfing":
-                encounter_data[encounter_type] = [subloc for subloc, pokemons in data.items() if isinstance(pokemons, list) and pokemon_name in pokemons]
-
-            elif encounter_type == "Fishing" or encounter_type == "Other":
-                encounter_data[encounter_type] = {subloc: [subtype for subtype, pokemons in subloc_data.items() if isinstance(pokemons, list) and pokemon_name in pokemons]
-                                                 for subloc, subloc_data in data.items() if isinstance(subloc_data, dict) and any(isinstance(pokemons, list) and pokemon_name in pokemons for pokemons in subloc_data.values())}
-                
-        return encounter_data
-        
-
     
     
     def to_dict(self):

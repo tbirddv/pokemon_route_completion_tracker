@@ -1,7 +1,7 @@
 [project]
 name = "pokemon-route-completion-tracker"
-version = "0.1.0"
-description = "Add your description here"
+version = "0.3.0"
+description = "A Command Line program to track the completion of the Pokedex for various games."
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = []

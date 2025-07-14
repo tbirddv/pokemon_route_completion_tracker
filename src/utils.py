@@ -6,6 +6,13 @@ from pathlib import Path
 from dataclasses import dataclass
 from src.pokemon import Pokemon, Local_Gen1
 from src.location import Location, Gen1Location
+from enum import Enum
+
+
+class ObjectType(Enum):
+    POKEMON = 'pokemon'
+    LOCATION = 'location'
+
 
 @dataclass
 class GameSettings:
@@ -65,17 +72,20 @@ class SaveData:
 class AppConfig:
     tracked_game: SupportedGames = None
     companion_tracker: bool = False  # Whether to track companion games in area reports
+    evolution_track: bool = False  # Whether to track evolutions in catch/reset operations
 
     @classmethod
     def from_dict(cls, data):
         tracked_game = SupportedGames(data['tracked_game']) if 'tracked_game' in data and data['tracked_game'] else None
         companion_tracker = data.get('companion_tracker', False)
-        return cls(tracked_game=tracked_game, companion_tracker=companion_tracker)
+        evolution_track = data.get('evolution_track', False)
+        return cls(tracked_game=tracked_game, companion_tracker=companion_tracker, evolution_track=evolution_track)
     
     def to_dict(self):
         return {
             'tracked_game': self.tracked_game.value if self.tracked_game else None,
-            'companion_tracker': self.companion_tracker
+            'companion_tracker': self.companion_tracker,
+            'evolution_track': self.evolution_track
         }
 
 def get_game_enum(game_name):
@@ -141,16 +151,16 @@ def load_app_config():
     if not config_path.exists():
         config_path.parent.mkdir(parents=True, exist_ok=True)
         with open(config_path, 'w', encoding='utf-8') as config_file:
-            json.dump({'tracked_game': None, 'companion_tracker': False}, config_file, indent=4)
-        return AppConfig(tracked_game=None, companion_tracker=False)
+            json.dump({'tracked_game': None, 'companion_tracker': False, 'evolution_track': False}, config_file, indent=4)
+        return AppConfig(tracked_game=None, companion_tracker=False, evolution_track=False)
     try:
         with open(config_path, 'r', encoding='utf-8') as config_file:
             return AppConfig.from_dict(json.load(config_file))
     except (json.JSONDecodeError, KeyError, ValueError) as e:
         print(f"Error loading config file: {e}. Resetting to default configuration.")
         with open(config_path, 'w', encoding='utf-8') as config_file:
-            json.dump({'tracked_game': None, 'companion_tracker': False}, config_file, indent=4)
-        return AppConfig(tracked_game=None, companion_tracker=False)
+            json.dump({'tracked_game': None, 'companion_tracker': False, 'evolution_track': False}, config_file, indent=4)
+        return AppConfig(tracked_game=None, companion_tracker=False, evolution_track=False)
     except OSError as e:
         print(f"Error accessing config file: {e}. Please ensure the .pokemon_tracker directory is accessible.")
         sys.exit(1)
@@ -172,4 +182,41 @@ def change_tracked_game(game_name):
     else:
         print("No game is currently being tracked.")
 
+def format_list_for_output(items, indent_level, max_width):
+    if not items:
+        return ""
     
+    title_items = [item.title() for item in items]
+    lines = []
+    current_line = " " * indent_level
+    for item in title_items:
+        if len(current_line) + len(item) + 2 > max_width and len(current_line) > indent_level:
+            lines.append(current_line.rstrip(", "))
+            current_line = " " * indent_level + item
+        else:
+            if current_line == " " * indent_level:
+                current_line += item
+            else:
+                item_with_comma = ", " + item
+                current_line += item_with_comma
+    lines.append(current_line.rstrip(", "))
+    return "\n".join(lines)
+
+def get_terminal_width(default=80):
+    try:
+        width = shutil.get_terminal_size().columns
+        return width if width > 0 else default
+    except Exception:
+        return default
+
+def get_object_from_save(save_data: SaveData, object_name: str, object_type: ObjectType):
+    object_name = object_name.strip().lower()
+    if object_type == ObjectType.POKEMON:
+        for pokemon in save_data.pokemon:
+            if pokemon.name == object_name:
+                return pokemon
+    elif object_type == ObjectType.LOCATION:
+        for location in save_data.locations:
+            if location.name.lower() == object_name:
+                return location
+    return None    

@@ -1,41 +1,15 @@
-from src.utils import (get_game_enum, SaveData, save_game_data, load_save_file)
+from src.utils import get_game_enum,  load_save_file, get_terminal_width, format_list_for_output, get_object_from_save, ObjectType
 from Data.constants import SupportedGames, Generation_1
 from src.pokemon import Local_Gen1, Pokemon
 from src.location import Gen1Location, Location
-import shutil
-import math
 
-def format_list_for_output(items, indent_level, max_width):
-    if not items:
-        return ""
-    
-    title_items = [item.title() for item in items]
-    lines = []
-    current_line = " " * indent_level
-    for item in title_items:
-        if len(current_line) + len(item) + 2 > max_width and len(current_line) > indent_level:
-            lines.append(current_line.rstrip(", "))
-            current_line = " " * indent_level + item
-        else:
-            if current_line == " " * indent_level:
-                current_line += item
-            else:
-                item_with_comma = ", " + item
-                current_line += item_with_comma
-    lines.append(current_line.rstrip(", "))
-    return "\n".join(lines)
 
-def get_terminal_width(default=80):
-    try:
-        width = shutil.get_terminal_size().columns
-        return width if width > 0 else default
-    except Exception:
-        return default
 
-def simple_area_report(game_name, area_name):
+def simple_area_report(game_name, area_name, companion_mode=False):
     game = get_game_enum(game_name)
     save_data = load_save_file(game.value)
     area_name = area_name.strip().lower()
+    terminal_width = get_terminal_width(default=80)
 
     found_area = None
     for location in save_data.locations:
@@ -48,12 +22,27 @@ def simple_area_report(game_name, area_name):
         return
     
     print(f"\n--- Simple Area Report for: {found_area.name} in Pokemon {game.value} ---")
-    print(f"Caught Pokemon: {', '.join(sorted([p.title() for p in found_area.caught])) if found_area.caught else 'None'}")
+    print("\nCaught:\n")
+    if found_area.caught:
+        print(format_list_for_output([p.title() for p in sorted(found_area.caught)], indent_level=8, max_width=terminal_width))
+    else:
+        print("        None")
+    if found_area.evolvable:
+        print("\nEvolvable Pokemon (not caught, but can be evolved from another caught Pokemon):")
+        formated_evolvable = format_list_for_output([p.title() for p in sorted(found_area.evolvable)], indent_level=8, max_width=terminal_width)
+        print(f"\n{formated_evolvable}")
+    if found_area.devolvable:
+        print("\nBreedable Pokemon (not caught, but can be obtained by breeding another caught Pokemon):")
+        formated_devolvable = format_list_for_output([p.title() for p in sorted(found_area.devolvable)], indent_level=8, max_width=terminal_width)
+        print(f"\n{formated_devolvable}")
     uncaught = found_area.uncaught_fields()[game]['All']
-    print(f"Uncaught Pokemon: {', '.join(sorted([p.title() for p in uncaught]) if uncaught else 'None')}")
+    if uncaught:
+        print("\nUncaught Pokemon:\n")
+        formated_uncaught = format_list_for_output([p.title() for p in sorted(uncaught)], indent_level=8, max_width=terminal_width)
+        print(f"{formated_uncaught}\n")
     if not uncaught:
         print("All Pokemon in this area have been caught!")
-    else:
+    if companion_mode:
         if save_data.remaining_unavailable_pokemon:
             for game_in_gen in found_area.uncaught_fields().keys():
                 if game_in_gen == game:
@@ -64,7 +53,9 @@ def simple_area_report(game_name, area_name):
                         if pokemon in found_area.uncaught_fields()[game_in_gen]['All']:
                             companion_game_uncaught.append(pokemon)
                 if companion_game_uncaught:
-                    print(f"Uncaught Pokemon unavailable in this game found in this area of Pokemon {game_in_gen.value}: {', '.join(sorted(companion_game_uncaught))}")
+                    print(f"Uncaught Pokemon unavailable in this game found in this area of Pokemon {game_in_gen.value}:")
+                    formated_companion_uncaught = format_list_for_output([p.title() for p in sorted(companion_game_uncaught)], indent_level=8, max_width=terminal_width)
+                    print(formated_companion_uncaught)
 
 def build_detailed_report_for_game(game, game_specific_uncaught_fields, tracking_types: set, companion_version=False, filtered_pokemon_list=None): #all is default state, removed kwarg
     """
@@ -93,32 +84,37 @@ def build_detailed_report_for_game(game, game_specific_uncaught_fields, tracking
         if isinstance(encounter_type_data, dict): #This should always be true since encounter types are always dicts of sublocations
             sublocation_output_blocks = []
             for sublocation_name, sublocation_data in encounter_type_data.items():
-                sublocation_string = f"      {sublocation_name}: " if sublocation_name.lower() != "main" else "      " #We always want some indenting, but no sublocation name for main, always used can be defined here
+                sublocation_indent = " " * len(encounter_type_name) + "  "
+                sublocation_string = f"{sublocation_indent}{sublocation_name}: " if sublocation_name.lower() != "main" else f"{sublocation_indent}" #We always want some indenting, but no sublocation name for main, always used can be defined here
 
                 if isinstance(sublocation_data, list): #This should be walking/surfing encounters
                     if sublocation_data: #Skips empty lists
                         if filtered_pokemon_list is not None: #Companion game with filtered pokemon list
                             filtered_sublocation_data = [p for p in sublocation_data if p in filtered_pokemon_list]
                             if filtered_sublocation_data:
-                                sublocation_output_blocks.append(sublocation_string + ", ".join([p.title() for p in sorted(filtered_sublocation_data)]))
+                                sublocation_output_blocks.append(sublocation_string + format_list_for_output([p.title() for p in sorted(filtered_sublocation_data)], indent_level=1, max_width=get_terminal_width(default=80)))
                         else: #Tracked game or companion game with no filtered list, include all pokemon
-                            sublocation_output_blocks.append(sublocation_string + ", ".join([p.title() for p in sorted(sublocation_data)]))
+                            sublocation_output_blocks.append(sublocation_string + format_list_for_output([p.title() for p in sorted(sublocation_data)], indent_level=1, max_width=get_terminal_width(default=80)))
 
-                    elif isinstance(sublocation_data, dict): #This should be fishing/other encounters with subtypes
-                        subtype_lines = []
-                        for subtype_name, subtype_data in sublocation_data.items():
-                            if subtype_data: #Only print subtypes with data
-                                if filtered_pokemon_list is not None: #Companion game with filtered pokemon list
-                                    filtered_subtype_data = [p for p in subtype_data if p in filtered_pokemon_list]
-                                    if filtered_subtype_data:
-                                        subtype_lines.append(f"        {subtype_name}: {', '.join([p.title() for p in sorted(filtered_subtype_data)])}")
-                                else: #Tracked game or companion game with no filtered list, include all pokemon
-                                    subtype_lines.append(f"        {subtype_name}: {', '.join([p.title() for p in sorted(subtype_data)])}")
-                        if subtype_lines:
-                            sublocation_output_blocks.append(sublocation_string + "\n" + "\n".join(subtype_lines))
+                elif isinstance(sublocation_data, dict): #This should be fishing/other encounters with subtypes
+                    subtype_lines = []
+                    for subtype_name, subtype_data in sublocation_data.items():
+                        if subtype_data: #Only print subtypes with data
+                            if filtered_pokemon_list is not None: #Companion game with filtered pokemon list
+                                filtered_subtype_data = [p for p in subtype_data if p in filtered_pokemon_list]
+                                if filtered_subtype_data:
+                                    subtype_lines.append(f"{subtype_name}:" + format_list_for_output([p.title() for p in sorted(filtered_subtype_data)], indent_level=1, max_width=get_terminal_width(default=80)))
+                            else: #Tracked game or companion game with no filtered list, include all pokemon
+                                subtype_lines.append(f"{subtype_name}:" + format_list_for_output([p.title() for p in sorted(subtype_data)], indent_level=1, max_width=get_terminal_width(default=80)))
+                    if subtype_lines:
+                        if sublocation_string.strip():
+                            indent = " " * len(sublocation_string)
+                            sublocation_output_blocks.extend([sublocation_string] + [indent + line for line in subtype_lines])
+                        else:
+                            sublocation_output_blocks.append(f"{sublocation_indent}" + f"\n{sublocation_indent}".join(subtype_lines))
 
             if sublocation_output_blocks: #No need for additional check since it is only populated if there is data to show
-                encounter_blocks.append(f"  {encounter_type_name}:\n" + "\n  ".join(sublocation_output_blocks))
+                encounter_blocks.append(f"  {encounter_type_name}:\n" + "\n".join(sublocation_output_blocks))
             
             
         elif isinstance(encounter_type_data, list): #This should never happen just here for safety, encounter types should always be dicts of sublocations
@@ -127,15 +123,22 @@ def build_detailed_report_for_game(game, game_specific_uncaught_fields, tracking
                     if filtered_pokemon_list is not None: #Companion game with filtered pokemon list
                         filtered_encounter_data = [p for p in encounter_type_data if p in filtered_pokemon_list]
                         if filtered_encounter_data:
-                            encounter_blocks.append(f"    {encounter_type_name}:\n      " + ", ".join(sorted([p.title() for p in filtered_encounter_data])))
+                            encounter_blocks.append(f"    {encounter_type_name}:\n      " + format_list_for_output([p.title() for p in sorted(filtered_encounter_data)], indent_level=6, max_width=get_terminal_width(default=80)))
                     else: #Tracked game or companion game with no filtered list, include all pokemon
-                        encounter_blocks.append(f"  {encounter_type_name}:\n      " + ", ".join(sorted([p.title() for p in encounter_type_data])))
+                        encounter_blocks.append(f"  {encounter_type_name}:\n      " + format_list_for_output([p.title() for p in sorted(encounter_type_data)], indent_level=6, max_width=get_terminal_width(default=80)))
     if encounter_blocks: #Again will only be populated if there is data to show
         if not companion_version:
             report_lines.append("\nUncaught Pokemon in this area:")
+            report_lines.extend(encounter_blocks)
         if companion_version:
             report_lines.append(game.value + ":")
-        report_lines.extend(encounter_blocks)
+            game_indent = " " * (len(game.value))  # +1 for the colon
+    
+            for block in encounter_blocks:
+                lines = block.split('\n')
+                # Only indent the first line (encounter type), keep relative indentation for sublines
+                indented_lines = [game_indent + lines[0]] + [game_indent + line for line in lines[1:]]
+                report_lines.extend(indented_lines)
 
         
 
@@ -162,11 +165,7 @@ def detailed_area_report(game_name, area_name, walking=False, surfing=False, fis
     save_data = load_save_file(game.value)
     area_name = area_name.strip().lower()
     
-    found_area = None
-    for location in save_data.locations:
-        if location.name.lower() == area_name:
-            found_area = location
-            break
+    found_area = get_object_from_save(save_data, area_name, ObjectType.LOCATION)
 
     if not found_area:
         print(f"Area {area_name} not found in save data for game {game.value}. Please ensure correct game is loaded and area name is accurate.")
@@ -174,15 +173,28 @@ def detailed_area_report(game_name, area_name, walking=False, surfing=False, fis
     
     if isinstance(found_area, Location):
         if tracking_types == {"Walking", "Surfing", "Fishing", "Other"}:
-            print(f"\n--- Detailed Area Report for: {found_area.name} in Pokemon {game.value} (Tracking all encounter types) ---")
+
+            header = f"\n--- Detailed Area Report for: {found_area.name} in Pokemon {game.value} (Tracking all encounter types) ---"
         else:
-            print(f"\n--- Detailed Area Report for: {found_area.name} in Pokemon {game.value} (Tracking encounter types: {', '.join(sorted(tracking_types))}) ---")
+            header = f"\n--- Detailed Area Report for: {found_area.name} in Pokemon {game.value} (Tracking encounter types: {', '.join(sorted(tracking_types))}) ---"
+        print(header)
         print("\nCaught Pokemon:")
         if found_area.caught:
-            print(f"  {', '.join(sorted([p.title() for p in found_area.caught]))}")
+            formated_caught = format_list_for_output([p.title() for p in found_area.caught], indent_level=2, max_width=get_terminal_width(default=80))
+            print(formated_caught)
         else:
             print("  None")
         print()
+        if found_area.evolvable:
+            print("Evolvable Pokemon (not caught, but can be evolved from another caught Pokemon):")
+            formated_evolvable = format_list_for_output([p.title() for p in found_area.evolvable], indent_level=2, max_width=get_terminal_width(default=80))
+            print(formated_evolvable)
+            print()
+        if found_area.devolvable:
+            print("Breedable Pokemon (not caught, but can be obtained by breeding another caught Pokemon):")
+            formated_devolvable = format_list_for_output([p.title() for p in found_area.devolvable], indent_level=2, max_width=get_terminal_width(default=80))
+            print(formated_devolvable)
+            print()
         uncaught_fields_data = found_area.uncaught_fields()
         if not uncaught_fields_data[game]["All"]: #Do not have to check for presense in game as we traverse over tracked types
             print("All Pokemon in this area have been caught in this game!")
@@ -231,11 +243,7 @@ def basic_individual_pokemon_report(game_name, pokemon_name, location=False, com
     save_data = load_save_file(game.value)
     pokemon_name = pokemon_name.strip().lower()
 
-    found_pokemon = None
-    for pokemon in save_data.pokemon:
-        if pokemon.name == pokemon_name:
-            found_pokemon = pokemon
-            break
+    found_pokemon = get_object_from_save(save_data, pokemon_name, ObjectType.POKEMON)
 
     if not found_pokemon:
         print(f"Pokemon {pokemon_name} not found in save data for game {game.value}. Please ensure correct game is loaded and Pokemon name is accurate.")
@@ -243,22 +251,30 @@ def basic_individual_pokemon_report(game_name, pokemon_name, location=False, com
     
     print(f"\n--- Basic Report for: #{found_pokemon.id} {found_pokemon.name.title()} in Pokemon {game.value} ---")
     print()
-    print(f"Status: {found_pokemon.status}")
+    print("Status:")
+    if found_pokemon.status == "Evolvable":
+        print(f"{found_pokemon.name.title()} is not caught, but can be evolved from {' -> '.join([p.title() for p in found_pokemon.devolutions])}.")
+    elif found_pokemon.status == "Devolvable":
+        print(f"{found_pokemon.name.title()} is not caught, but can be obtained by breeding {' or '.join([p.title() for p in found_pokemon.evolutions])}.")
+    else:
+        print(f"{found_pokemon.status}")
     print()
     if location:
         locations_fields = found_pokemon.locations_fields()
         if locations_fields[game]:
-            print(f"Locations in current game: {', '.join(sorted([loc.title() for loc in locations_fields[game]]))}")
+            print(f"Locations {found_pokemon.name.title()} is found in the current game:\n")
+            formated_locations = format_list_for_output([loc.title() for loc in sorted(locations_fields[game])], indent_level=2, max_width=get_terminal_width(default=80))
+            print(formated_locations)
         else:
             print("Not found in any locations in current game.")
     print()
     if companions:
-        print("Locations in companion games:")
+        print(f"Locations {found_pokemon.name.title()} is found in other games in this generation:")
         for game_in_gen, locs in locations_fields.items():
             if game_in_gen == game:
                 continue
             if locs:
-                print(f"  {game_in_gen.value}: {', '.join(sorted([loc.title() for loc in locs]))}")
+                print(f"  {game_in_gen.value}: {format_list_for_output([loc.title() for loc in sorted(locs)], indent_level=len(game_in_gen.value)+2, max_width=get_terminal_width(default=80))}")
             else:
                 print(f"  {game_in_gen.value}: Not found in any locations in this game.")
 
@@ -268,11 +284,22 @@ def simple_completion_report(game_name):
     save_data = load_save_file(game.value)
     total_pokemon = len(save_data.pokemon)
     caught_count = 0
+    evolvable_count = 0
+    breedable_count = 0
+    # Count caught and evolvable pokemon
     for pokemon in save_data.pokemon:
         if pokemon.status == 'Caught':
             caught_count += 1
+        elif pokemon.status == 'Evolvable':
+            evolvable_count += 1
+        elif pokemon.status == 'Devolvable':
+            breedable_count += 1
     print(f"Total Pokemon: {total_pokemon}")
     print(f"Caught Pokemon: {caught_count}")
+    if evolvable_count > 0:
+        print(f"Evolvable Pokemon (not caught, but can be evolved from another caught Pokemon): {evolvable_count}")
+    if breedable_count > 0:
+        print(f"Breedable Pokemon (not caught, but can be obtained by breeding another caught Pokemon): {breedable_count}")
     print(f"Uncaught Pokemon: {total_pokemon - caught_count}")
     print(f"Your Pokedex is {caught_count / total_pokemon * 100:.2f}% complete.")
 
@@ -284,15 +311,19 @@ def detailed_completion_report(game_name, companion=False):
     
     caught_pokemon = [p for p in save_data.pokemon if p.status == 'Caught']
     if companion:
-        uncaught_pokemon = [p for p in save_data.pokemon if p.status != 'Caught' and p.name not in save_data.unavailable_pokemon]
+        uncaught_pokemon = [p for p in save_data.pokemon if p.status == 'Uncaught' and p.name not in save_data.unavailable_pokemon]
+        evolvable_pokemon = [p for p in save_data.pokemon if p.status == 'Evolvable']
+        breedable_pokemon = [p for p in save_data.pokemon if p.status == 'Devolvable']
         unavailable_pokemon = [p for p in save_data.remaining_unavailable_pokemon]
     else:
-        uncaught_pokemon = [p for p in save_data.pokemon if p.status != 'Caught']
+        uncaught_pokemon = [p for p in save_data.pokemon if p.status != 'Uncaught']
+        evolvable_pokemon = [p for p in save_data.pokemon if p.status == 'Evolvable']
+        breedable_pokemon = [p for p in save_data.pokemon if p.status == 'Devolvable']
         unavailable_pokemon = []
     
     total_pokemon = len(save_data.pokemon)
     caught_count = len(caught_pokemon)
-    uncaught_count = len(uncaught_pokemon)
+    uncaught_count = total_pokemon - caught_count
 
     print(f"Total Pokemon: {total_pokemon}")
     print(f"Caught Pokemon: {caught_count}")
@@ -313,6 +344,16 @@ def detailed_completion_report(game_name, companion=False):
     else:
         print("All Pokemon have been caught! Congratulations!")
     print()
+    if evolvable_pokemon:
+        print("Evolvable Pokemon (not caught, but can be evolved from another caught Pokemon):")
+        formated_evolvable = format_list_for_output([p.name for p in evolvable_pokemon], indent_level=2, max_width=terminal_width)
+        print(formated_evolvable)
+        print()
+    if breedable_pokemon:
+        print("Breedable Pokemon (not caught, but can be obtained by breeding another caught Pokemon):")
+        formated_breedable = format_list_for_output([p.name for p in breedable_pokemon], indent_level=2, max_width=terminal_width)
+        print(formated_breedable)
+        print()
     if unavailable_pokemon:
         print("Uncaught pokemon not available in this game (e.g., version exclusives, event-only):")
         formated_unavailable = format_list_for_output(unavailable_pokemon, indent_level=2, max_width=terminal_width)
