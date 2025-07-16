@@ -124,9 +124,9 @@ def basic_individual_pokemon_report(game_name, pokemon_name, location=False, com
         print(f"{found_pokemon.status}")
     print()
     if location:
-        if found_pokemon.locations[game]:
+        if found_pokemon.locations[game.value]:
             print(f"Locations {found_pokemon.name.title()} is found in the current game:\n")
-            formated_locations = format_list_for_output([loc.title() for loc in sorted(found_pokemon.locations[game])], indent_level=2, max_width=get_terminal_width(default=80))
+            formated_locations = format_list_for_output([loc.title() for loc in sorted(found_pokemon.locations[game.value])], indent_level=2, max_width=get_terminal_width(default=80))
             print(formated_locations)
         else:
             print("Not found in any locations in current game.")
@@ -134,12 +134,12 @@ def basic_individual_pokemon_report(game_name, pokemon_name, location=False, com
     if companions:
         print(f"Locations {found_pokemon.name.title()} is found in other games in this generation:")
         for game_in_gen, locs in found_pokemon.locations.items():
-            if game_in_gen == game:
+            if game_in_gen == game.value:
                 continue
             if locs:
-                print(f"  {game_in_gen.value}: {format_list_for_output([loc.title() for loc in sorted(locs)], indent_level=len(game_in_gen.value)+2, max_width=get_terminal_width(default=80))}")
+                print(format_pokemon_data(game_in_gen, [loc for loc in locs], get_terminal_width(default=80), indent_level=2))
             else:
-                print(f"  {game_in_gen.value}: Not found in any locations in this game.")
+                print(f"  {game_in_gen}: Not found in any locations in this game.")
 
 
 def simple_completion_report(game_name):

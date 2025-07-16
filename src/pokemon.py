@@ -16,6 +16,7 @@ class Pokemon:
 class Local_Gen1(Pokemon):
     def __init__(self, name, id, locations, devolutions, evolutions, status="Uncaught"):
         super().__init__(name, id, status)
+        self.id = id
         self.locations = locations
         self.devolutions = devolutions
         self.evolutions = evolutions

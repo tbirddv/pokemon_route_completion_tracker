@@ -7,7 +7,7 @@ from src.location import Gen1Location, Location
 from src.utils import get_game_enum, change_tracked_game, load_app_config
 from Data.constants import SupportedGames, Generation_1
 
-
+SCRIPT_DIR = Path(__file__).parent.resolve().parent
     
 def delete_game_save(game):
     if not isinstance(game, SupportedGames):
@@ -50,8 +50,8 @@ def new_game(game_name, overwrite=False, cli_mode=False):
     # Initialize save file
     save_file_path = save_dir / 'save.json'
     if game in Generation_1:
-        pokemon_path = Path.cwd() / 'Data/Pokemon/local_gen_1.csv'
-        location_path = Path.cwd() / 'Data/Locations/kanto_gen_1.csv'
+        pokemon_path = SCRIPT_DIR / 'Data/Pokemon/local_gen_1.csv'
+        location_path = SCRIPT_DIR / 'Data/Locations/kanto_gen_1.csv'
         if not pokemon_path.exists():
             print(f"Error: Pokemon data file for Generation 1 not found at {pokemon_path}. Cannot create new game save.")
             sys.exit(1)
