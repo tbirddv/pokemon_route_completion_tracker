@@ -33,6 +33,13 @@ def main():
     change_config_parser.add_argument('game_name', type=str, nargs='?', help='Name of the game to set as tracked. Omit the word Pokemon (e.g., Red, Blue, Yellow)')
     change_config_parser.set_defaults(func=handle_change_config)
 
+    change_item_parser = subparsers.add_parser('item', help='Change item settings for the current game (e.g., surf, fishing rods).')
+    change_item_parser.add_argument('-s', '--surf', action='store_true', help='Toggle surf status for the current game (if applicable)')
+    change_item_parser.add_argument('-SR', '--super-rod', action='store_true', help='Toggle super rod status for the current game (if applicable)')
+    change_item_parser.add_argument('-GR', '--good-rod', action='store_true', help='Toggle good rod status for the current game (if applicable)')
+    change_item_parser.add_argument('-OR', '--old-rod', action='store_true', help='Toggle old rod status for the current game (if applicable)')
+    change_item_parser.set_defaults(func=handle_item_change)
+
     catch_parser = subparsers.add_parser('catch', help='Mark a Pokemon as caught')
     catch_parser.add_argument('pokemon_name', type=str, help='Name of the Pokemon to mark as caught')
     catch_parser.set_defaults(func=handle_catch_pokemon)
@@ -58,6 +65,7 @@ def main():
     area_report_parser.add_argument('-f', '--fishing', action='store_true', help='Generate a detailed area report including fishing encounters')
     area_report_parser.add_argument('-s', '--surfing', action='store_true', help='Generate a detailed area report including surfing encounters')
     area_report_parser.add_argument('-o', '--other', action='store_true', help='Generate a detailed area report including other encounter types')
+    area_report_parser.add_argument('-a', '--all', action='store_true', help='Generate a detailed area report including all encounter types')
     area_report_parser.add_argument('-C', '--companion-details', action='store_true', help='Include details for companion games in the report (if applicable)')
     area_report_parser.set_defaults(func=handle_area_report)
 
@@ -158,6 +166,34 @@ def handle_change_config(args):
             change_tracked_game(args.game_name)
             return
 
+def handle_item_change(args):
+    config = load_app_config()
+    if config.tracked_game is None:
+        print("No game currently being tracked. Please set a game using the 'change' command.")
+        return
+    save_data = load_save_file(config.tracked_game.value)
+    settings_changed = False
+    if args.surf:
+        save_data.settings.surf = not save_data.settings.surf
+        print(f"Surf status for Pokemon {config.tracked_game.value} set to {save_data.settings.surf}.")
+        settings_changed = True
+    if args.super_rod:
+        save_data.settings.super_rod = not save_data.settings.super_rod
+        print(f"Super Rod status for Pokemon {config.tracked_game.value} set to {save_data.settings.super_rod}.")
+        settings_changed = True
+    if args.good_rod:
+        save_data.settings.good_rod = not save_data.settings.good_rod
+        print(f"Good Rod status for Pokemon {config.tracked_game.value} set to {save_data.settings.good_rod}.")
+        settings_changed = True
+    if args.old_rod:
+        save_data.settings.old_rod = not save_data.settings.old_rod
+        print(f"Old Rod status for Pokemon {config.tracked_game.value} set to {save_data.settings.old_rod}.")
+        settings_changed = True
+    if settings_changed:
+        save_game_data(config.tracked_game.value, save_data)
+    else:
+        print("No item settings were changed. Please specify at least one item option to toggle.")
+
 def handle_catch_pokemon(args):
     config = load_app_config()
     if config.tracked_game is None:
@@ -192,15 +228,16 @@ def handle_area_report(args):
         print("No game currently being tracked. Please set a game using the 'change' command.")
         return
     if args.simple:
-        if not args.area_name:
-            print("Please specify an area name for the report.")
-            return
         simple_area_report(config.tracked_game.value, args.area_name, companion_mode=config.companion_tracker)
     else:
-        if not args.area_name:
-            print("Please specify an area name for the report.")
-            return
-        detailed_area_report(config.tracked_game.value, args.area_name, walking=args.walking, fishing=args.fishing, surfing=args.surfing, other=args.other, unavailable=config.companion_tracker, companion_details=args.companion_details)
+        if not (args.walking or args.fishing or args.surfing or args.other or args.all):
+            save_data=load_save_file(config.tracked_game.value)
+            kwargs = {"walking": True, "surfing": save_data.settings.surf, "super_rod": save_data.settings.super_rod, "good_rod": save_data.settings.good_rod, "old_rod": save_data.settings.old_rod, "other": True, "companion_tracking": config.companion_tracker, "companion_details": args.companion_details}
+        elif args.all:
+            kwargs = {"walking": True, "surfing": True, "super_rod": True, "good_rod": True, "old_rod": True, "other": True, "companion_tracking": config.companion_tracker, "companion_details": args.companion_details}
+        else:
+            kwargs = {"walking": args.walking, "surfing": args.surfing, "super_rod": args.fishing, "good_rod": args.fishing, "old_rod": args.fishing, "other": args.other, "companion_tracking": config.companion_tracker, "companion_details": args.companion_details}
+        detailed_area_report(config.tracked_game.value, args.area_name, **kwargs)
 
 def handle_pokemon_report(args):
     config = load_app_config()

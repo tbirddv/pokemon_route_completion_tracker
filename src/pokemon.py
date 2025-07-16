@@ -1,81 +1,60 @@
-from Data.constants import SupportedGames
+from Data.constants import SupportedGames, generation_1_location_column_name_mappings
 
 class Pokemon:
-    def __init__(self, name, id, status="Uncaught"):
+    def __init__(self, name, national_id, status="Uncaught"):
         self.name = name
-        self.id = id
+        self.national_id = national_id
         self.status = status
 
     def to_dict(self):
         return {
             'name': self.name,
-            'id': self.id,
+            'national_id': self.national_id,
             'status': self.status
         }
 
 class Local_Gen1(Pokemon):
-    def __init__(self, name, id, red_locations, blue_locations, yellow_locations, devolutions, evolutions, status="Uncaught"):
+    def __init__(self, name, id, locations, devolutions, evolutions, status="Uncaught"):
         super().__init__(name, id, status)
-        self.red_locations = red_locations
-        self.blue_locations = blue_locations
-        self.yellow_locations = yellow_locations
+        self.locations = locations
         self.devolutions = devolutions
         self.evolutions = evolutions
     
+    @staticmethod
+    def _process_location_fields(routes, uniques):
+        return [f"Route {route.strip()}" for route in routes.strip().split('/') if route.strip() != '' and route.strip().lower() != "none"] + [unique.strip() for unique in uniques.strip().split('/') if unique.strip() != '' and unique.strip().lower() != "none"]
+    
+    @staticmethod
+    def _process_evolution_field(evolution_str):
+        return [pokemon.strip().lower() for pokemon in evolution_str.strip().split('/') if pokemon.strip() != '' and pokemon.strip().lower() != "none"]
+
     @classmethod
     def from_csv(cls, row):
         name = row['Name'].lower()
         id = int(row['ID'])
-        red_locations = [f"Route {route.strip()}" for route in row['Red Routes'].strip().split('/') if route.strip() != '' and route.strip().lower() != "none"] + [unique.strip() for unique in row['Red Uniques'].strip().split('/') if unique.strip() != '' and unique.strip().lower() != "none"]
-        blue_locations = [f"Route {route.strip()}" for route in row['Blue Routes'].strip().split('/') if route.strip() != '' and route.strip().lower() != "none"] + [unique.strip() for unique in row['Blue Uniques'].strip().split('/') if unique.strip() != '' and unique.strip().lower() != "none"]
-        yellow_locations = [f"Route {route.strip()}" for route in row['Yellow Routes'].strip().split('/') if route.strip() != '' and route.strip().lower() != "none"] + [unique.strip() for unique in row['Yellow Uniques'].strip().split('/') if unique.strip() != '' and unique.strip().lower() != "none"]
-        devolutions = [pokemon.strip().lower() for pokemon in row['Devolutions'].strip().split('/') if pokemon.strip() != '' and pokemon.strip().lower() != "none"]
-        evolutions = [pokemon.strip().lower() for pokemon in row['Evolutions'].strip().split('/') if pokemon.strip() != '' and pokemon.strip().lower() != "none"]
-        return cls(name, id, red_locations, blue_locations, yellow_locations, devolutions, evolutions)
-    
+        locations = {}
+        for game, columns in generation_1_location_column_name_mappings.items():
+            locations[game.value] = cls._process_location_fields(row[columns[0]], row[columns[1]])
+        devolutions = cls._process_evolution_field(row['Devolutions'])
+        evolutions = cls._process_evolution_field(row['Evolutions'])
+        return cls(name, id, locations, devolutions, evolutions)
+
     @classmethod
     def from_dict(cls, data):
         return cls(
             name=data['name'],
-            id=data['id'],
-            red_locations=data.get('red_locations', []),
-            blue_locations=data.get('blue_locations', []),
-            yellow_locations=data.get('yellow_locations', []),
+            id=data['national_id'],
+            locations=data.get('locations', {}),
             devolutions=data.get('devolutions', []),
             evolutions=data.get('evolutions', []),
             status=data.get('status', 'Uncaught')
         )
-    
-    def locations_fields(self):
-        return {
-            SupportedGames.RED: self.red_locations,
-            SupportedGames.BLUE: self.blue_locations,
-            SupportedGames.YELLOW: self.yellow_locations
-        }
 
-
-    def __repr__(self):
-        lines = [f"Gen1 Pokemon ID: {self.id}, Name: {self.name}, Status: {self.status}"]
-        
-        if self.red_locations:
-            lines.append(f"Red Locations: {self.red_locations}")
-        if self.blue_locations:
-            lines.append(f"Blue Locations: {self.blue_locations}")
-        if self.yellow_locations:
-            lines.append(f"Yellow Locations: {self.yellow_locations}")
-        if self.devolutions:
-            lines.append(f"Devolutions: {self.devolutions}")
-        if self.evolutions:
-            lines.append(f"Evolutions: {self.evolutions}")
-        
-        return ",\n".join(lines)
     
     def to_dict(self):
         base_dict = super().to_dict()
         base_dict.update({
-            'red_locations': self.red_locations,
-            'blue_locations': self.blue_locations,
-            'yellow_locations': self.yellow_locations,
+            'locations': self.locations,
             'devolutions': self.devolutions,
             'evolutions': self.evolutions
         })

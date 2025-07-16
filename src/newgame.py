@@ -59,37 +59,41 @@ def new_game(game_name, overwrite=False, cli_mode=False):
             print(f"Error: Location data file for Generation 1 not found at {location_path}. Cannot create new game save.")
             sys.exit(1)
         print(f"Loading Generation 1 data from {pokemon_path} and {location_path}.")
-        # Load Pokemon data
-        pokemon_list = []
-        location_list = []
-        unavailable_pokemon = []
-        with open(pokemon_path, mode='r', encoding='utf-8-sig') as pokemon_file:
-            pokemon_reader = csv.DictReader(pokemon_file)
-            for row in pokemon_reader:
-                pokemon = Local_Gen1.from_csv(row)
-                pokemon_list.append(pokemon)
-        with open(location_path, mode='r', encoding='utf-8-sig') as location_file:
-            location_reader = csv.DictReader(location_file)
-            for row in location_reader:
-                if row['Area Name'].strip().lower() == 'unavailable':
-                    raw_unavailable_str = row.get(f"{game.value} Walking", "")
-                    unavailable = [p.strip().lower() for p in raw_unavailable_str.split('/') if p.strip() and p.strip().lower() != 'none']
-                    unavailable_pokemon.extend(unavailable)
-                    continue
-                location = Gen1Location.from_csv(row)
-                location_list.append(location)
-        # Save initial game state
-        initial_save = {
-            'settings': {
-                'game': game.value
-            },
-            'pokemon': [p.to_dict() for p in pokemon_list],
-            'locations': [l.to_dict() for l in location_list],
-            'unavailable_pokemon': unavailable_pokemon,
-            'remaining_unavailable_pokemon': unavailable_pokemon.copy()
-        }
-        with open(save_file_path, 'w', encoding='utf-8') as save_file:
-            json.dump(initial_save, save_file, indent=4)
-        print(f"New game save for Pokemon {game.value} created successfully.")
+    # Load Pokemon data
+    pokemon_list = []
+    location_list = []
+    unavailable_pokemon = []
+    with open(pokemon_path, mode='r', encoding='utf-8-sig') as pokemon_file:
+        pokemon_reader = csv.DictReader(pokemon_file)
+        for row in pokemon_reader:
+            pokemon = Local_Gen1.from_csv(row)
+            pokemon_list.append(pokemon)
+    with open(location_path, mode='r', encoding='utf-8-sig') as location_file:
+        location_reader = csv.DictReader(location_file)
+        for row in location_reader:
+            if row['Area Name'].strip().lower() == 'unavailable':
+                raw_unavailable_str = row.get(f"{game.value} Walking", "")
+                unavailable = [p.strip().lower() for p in raw_unavailable_str.split('/') if p.strip() and p.strip().lower() != 'none']
+                unavailable_pokemon.extend(unavailable)
+                continue
+            location = Gen1Location.from_csv(row)
+            location_list.append(location)
+    # Save initial game state
+    initial_save = {
+        'settings': {
+            'game': game.value,
+            'surf': False,
+            'super_rod': False,
+            'good_rod': False,
+            'old_rod': False,
+        },
+        'pokemon': [p.to_dict() for p in pokemon_list],
+        'locations': [l.to_dict() for l in location_list],
+        'unavailable_pokemon': unavailable_pokemon,
+        'remaining_unavailable_pokemon': unavailable_pokemon.copy()
+    }
+    with open(save_file_path, 'w', encoding='utf-8') as save_file:
+        json.dump(initial_save, save_file, indent=4)
+    print(f"New game save for Pokemon {game.value} created successfully.")
     change_tracked_game(game.value)
 

@@ -16,17 +16,29 @@ class ObjectType(Enum):
 
 @dataclass
 class GameSettings:
-    game: SupportedGames  # Default to False if not specified
+    game: SupportedGames
+    surf: bool = False
+    super_rod: bool = False
+    good_rod: bool = False
+    old_rod: bool = False
 
     @classmethod
     def from_dict(cls, data):
         game = SupportedGames(data['game'])
-        return cls(game=game)
+        surf = data.get('surf', False)
+        super_rod = data.get('super_rod', False)
+        good_rod = data.get('good_rod', False)
+        old_rod = data.get('old_rod', False)
+        return cls(game=game, surf=surf, super_rod=super_rod, good_rod=good_rod, old_rod=old_rod)
     
     def to_dict(self):
         return {
             'game': self.game.value,
-            }
+            'surf': self.surf,
+            'super_rod': self.super_rod,
+            'good_rod': self.good_rod,
+            'old_rod': self.old_rod
+        }
     
 @dataclass
 class SaveData:
