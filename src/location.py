@@ -41,12 +41,22 @@ class Gen1Location(Location):
 
     @staticmethod
     def _process_walking_or_surfing(encounter_string):
+        '''
+        Process encounter strings for walking and surfing encounters.
+        Format: "Sublocation1:Pokemon1/Pokemon2;Sublocation2:Pokemon3/Pokemon4"
+        Returns a dict of sublocation to list of pokemon.
+        '''
         return {subloc.strip(): [mon.strip().lower() for mon in pokemon.strip().split('/') if mon.strip() != '' and mon.strip().lower() != "none"]
                 for subloc, pokemon in (sublocation.strip().split(':') for sublocation in encounter_string.strip().split(';') if sublocation.strip() != '' and sublocation.strip().lower() != "none" and len(sublocation.split(':')) == 2)
                 if subloc.strip() != '' and subloc.strip().lower() != "none" and pokemon.strip() != '' and pokemon.strip().lower() != "none"}
     
     @staticmethod
     def _process_fishing_or_other(encounter_string):
+        '''
+        Process encounter strings for fishing and other encounters.
+        Format: "Sublocation1~Subtype1:Pokemon1/Pokemon2~Subtype2:Pokemon3;Sublocation2~Subtype1:Pokemon4"
+        Returns a dict of sublocation to dict of subtype to list of pokemon.
+        '''
         encounter_dict = {}
         if encounter_string.strip() != '' and encounter_string.strip().lower() != "none":
             fishing_sublocations = encounter_string.strip().split(';')
@@ -120,16 +130,16 @@ class Gen1Location(Location):
         base_dict['encounter_data'] = self.encounter_data
         return base_dict
     
-    def update_pokemon_status_in_area(self, pokemon_name: str, modification_type: ModificationType = ModificationType.CATCH):
+    def update_pokemon_status_in_area(self, game: SupportedGames, pokemon_name: str, modification_type: ModificationType = ModificationType.CATCH):
         """
         This method is only intended to handle marking a pokemon as caught in a specific area.
-        If the game is tracking evolutions or devolutions this method will place eligible pokemon in the appropriate set, and remove them from other sets as appropriate.
+        If the tracker is tracking evolutions or devolutions this method will place eligible pokemon in the appropriate set, and remove them from other sets as appropriate.
         If the pokemon is not available in this area (i.e., not in any of the encounter lists for this area), this method will do nothing.
         If the pokemon is already marked as caught in this area, this method will do nothing.
         Arguments:
+            game: The game being tracked. Used to filter if caught/evolved/devolved pokemon is available in this area for the game being tracked.
             pokemon_name: Name of the pokemon to mark as caught in this area.
             modification_type: Type of modification to make. Default is CATCH, but can be any appropriate type. For purposes of this method only CATCH, EVOLVE, and DEVOLVE are equivalent.
-
         Returns:
             None
         """
@@ -140,8 +150,7 @@ class Gen1Location(Location):
         #Changed check to use the "const" lists, which are the full lists of pokemon available in this area, rather than the "uncaught" lists, which may be incomplete if the user has already caught some pokemon in this area
         #This ensures that if a user tries to mark a pokemon as caught in an area where it is not available, nothing will happen
         #This is important for ensuring that evolutions and devolutions are only tracked in areas where the pokemon is actually available
-        #For example, if a user catches a Pikachu in Viridian Forest, then evolves it to Raichu, the Raichu should not be marked as caught in Viridian Forest
-        #Similarly, if a user breeds a Pichu from a Pikachu, Pichu should not be marked as caught in Viridian Forest
+        #e.g. if a user catches a Pikachu, it should not be marked as caught in Mt. Moon where it is not available
         for game_data in self.encounter_data.values():
             if not isinstance(game_data['const']['All'], list):
                 continue
@@ -149,26 +158,32 @@ class Gen1Location(Location):
                 pokemon_available_in_area = True
                 break
         if pokemon_available_in_area:
-            #This check will be used for catching a pokemon, receiving a new pokemon via evolution, or gaining a new pokemon via breeding
-            #In all these cases, the pokemon is considered "caught" in this area, and should be removed from uncaught lists
-            if modification_type in [ModificationType.CATCH, ModificationType.EVOLVE, ModificationType.DEVOLVE]:
-                self.caught.add(pokemon_name)
-                if pokemon_name in self.evolvable:
-                    self.evolvable.remove(pokemon_name)
-                if pokemon_name in self.devolvable:
-                    self.devolvable.remove(pokemon_name)
-            #This check is used for marking a pokemon as eligible to get from evolution
-            #In this case, the pokemon is not considered "caught" in this area, but is considered "evolvable"
-            #So it is added to the evolvable set, and removed from the uncaught lists if tracked there. Needed for tracking evolutions properly
-            #Note that pokemon will only appear if they are available to be caught in this area
-            if modification_type == ModificationType.EVOLVABLE:
-                self.evolvable.add(pokemon_name)
-            #This check is used for marking a pokemon as eligible to get from devolution (e.g. breeding a baby pokemon)
-            #In this case, the pokemon is not considered "caught" in this area, but is considered "devolvable"
-            #So it is added to the devolvable set, and removed from the uncaught lists if tracked there. Needed for tracking devolutions properly
-            #Note that pokemon will only appear if they are available to be caught in this area
-            if modification_type == ModificationType.DEVOLVABLE:
-                self.devolvable.add(pokemon_name)
+            #Changing catch/evolve/devolve check to only apply for the game being tracked.
+            #This allows for proper tracking of completion of an area in a specific game
+            #i.e. 4 total pokemon in an area in red, same in blue, but different pokemon in each game
+            #if we caught 2 unique pokemon in red, and 1 unique pokemon traded from blue, we want to show 50% completion of the area, not 38% completion
+            if pokemon_name in self.encounter_data.get(game.value, {}).get('const', {}).get('All', []):
+                #This check will be used for catching a pokemon, receiving a new pokemon via evolution, or gaining a new pokemon via breeding
+                #In all these cases, the pokemon is considered "caught" in this area, and should be removed from uncaught lists
+                if modification_type in [ModificationType.CATCH, ModificationType.EVOLVE, ModificationType.DEVOLVE]:
+                    self.caught.add(pokemon_name)
+                    if pokemon_name in self.evolvable:
+                        self.evolvable.remove(pokemon_name)
+                    if pokemon_name in self.devolvable:
+                        self.devolvable.remove(pokemon_name)
+                #This check is used for marking a pokemon as eligible to get from evolution
+                #In this case, the pokemon is not considered "caught" in this area, but is considered "evolvable"
+                #So it is added to the evolvable set, and removed from the uncaught lists if tracked there. Needed for tracking evolutions properly
+                #Note that pokemon will only appear if they are available to be caught in this area
+                if modification_type == ModificationType.EVOLVABLE:
+                    self.evolvable.add(pokemon_name)
+                #This check is used for marking a pokemon as eligible to get from devolution (e.g. breeding a baby pokemon)
+                #In this case, the pokemon is not considered "caught" in this area, but is considered "devolvable"
+                #So it is added to the devolvable set, and removed from the uncaught lists if tracked there. Needed for tracking devolutions properly
+                #Note that pokemon will only appear if they are available to be caught in this area
+                if modification_type == ModificationType.DEVOLVABLE:
+                    self.devolvable.add(pokemon_name)
+            #We still want to remove the pokemon from all uncaught lists to facilitate companion game tracking
             for game_data in self.encounter_data.values():
                 if not isinstance(game_data['uncaught']['All'], list):
                     continue

@@ -1,5 +1,5 @@
 from src.utils import get_game_enum, SaveData, save_game_data, load_save_file, get_object_from_save, ObjectType
-from Data.constants import SupportedGames, Generation_1, complex_evolutions
+from Data.constants import SupportedGames, Generation_1, complex_evolutions, complex_evolutions_map
 from src.pokemon import Pokemon, Local_Gen1
 from src.location import Location, Gen1Location, ModificationType
             
@@ -7,44 +7,72 @@ from src.location import Location, Gen1Location, ModificationType
 def handle_evolution_tracking(game: SupportedGames, save_data: SaveData, found_pokemon: Pokemon):
     for evolution_name in getattr(found_pokemon, 'evolutions', []):
             evolution_pokemon = get_object_from_save(save_data, evolution_name, ObjectType.POKEMON)
-            if evolution_pokemon and evolution_pokemon.status != "Caught":
+            
+            if evolution_pokemon and evolution_pokemon.status != "Caught": #Have a raichu, catch a pikachu, don't mark raichu as evolvable
                 evolution_pokemon.status = "Evolvable"
                 for location in save_data.locations:
-                    location.update_pokemon_status_in_area(evolution_pokemon.name, modification_type=ModificationType.EVOLVABLE)
+                    location.update_pokemon_status_in_area(game, evolution_pokemon.name, modification_type=ModificationType.EVOLVABLE)
                 if evolution_pokemon.name in save_data.remaining_unavailable_pokemon:
                     save_data.remaining_unavailable_pokemon.remove(evolution_pokemon.name)
+            
             if game not in Generation_1:
                 for devolution_name in getattr(found_pokemon, 'devolutions', []):
                     devolution_pokemon = get_object_from_save(save_data, devolution_name, ObjectType.POKEMON)
-                    if devolution_pokemon and devolution_pokemon.status not in ["Caught", "Evolvable"]:
+                    if devolution_pokemon and devolution_pokemon.status not in ["Caught", "Evolvable"]: #have a pichu, catch a raichu, don't mark pichu or pikachu as devolvable
                         devolution_pokemon.status = "Devolvable"
                         for location in save_data.locations:
-                            location.update_pokemon_status_in_area(devolution_pokemon.name, modification_type=ModificationType.DEVOLVABLE)
+                            location.update_pokemon_status_in_area(game, devolution_pokemon.name, modification_type=ModificationType.DEVOLVABLE)
                         if devolution_pokemon.name in save_data.remaining_unavailable_pokemon:
                             save_data.remaining_unavailable_pokemon.remove(devolution_pokemon.name)
 
 def handle_evolvable_reset(game: SupportedGames, save_data: SaveData, found_pokemon: Pokemon, config_mode=False):
-    for evolution_name in getattr(found_pokemon, 'evolutions', []):
+    '''
+    Resets evolutions and devolutions of a pokemon to Uncaught if they are marked as Evolvable or Devolvable.
+    changed to ignore evolutions/devolutions if they are marked as Caught.
+    If config_mode is True, will not print messages about resetting evolutions/devolutions.
+    Arguments:
+        game: SupportedGames enum value representing the game being tracked.
+        save_data: SaveData object representing the current save data.
+        found_pokemon: Pokemon object representing the pokemon that was reset.
+        config_mode: Boolean indicating whether the function is being called in config mode (default: False).
+    Returns:
+        None
+    '''
+    evolutions = getattr(found_pokemon, 'evolutions', [])
+    devolutions = getattr(found_pokemon, 'devolutions', [])
+    if (evolutions or (game not in Generation_1 and devolutions)) and not config_mode:
+        print(f"Also resetting potential evolutions and baby pokemon to Uncaught.")
+    #Reset Evolable status of evolutions to Uncaught
+    for evolution_name in evolutions:
             evolution_pokemon = get_object_from_save(save_data, evolution_name, ObjectType.POKEMON)
-            if evolution_pokemon and evolution_pokemon.status != "Uncaught":
-                if not config_mode:
-                    print(f"Also resetting evolution {evolution_pokemon.name.title()} to Uncaught.")
+            if evolution_pokemon and evolution_pokemon.status == 'Evolvable':
                 evolution_pokemon.status = "Uncaught"
                 for location in save_data.locations:
                     location.reset_pokemon_status_in_area(evolution_pokemon.name)
                 if evolution_pokemon.name in save_data.unavailable_pokemon and evolution_pokemon.name not in save_data.remaining_unavailable_pokemon:
                     save_data.remaining_unavailable_pokemon.append(evolution_pokemon.name)
+    #IF another pokemon in the evolution chain is caught, correct statuses
+    for evolution_name in evolutions:
+        evolution_pokemon = get_object_from_save(save_data, evolution_name, ObjectType.POKEMON)
+        if evolution_pokemon and evolution_pokemon.status == "Caught":
+            handle_evolution_tracking(game, save_data, evolution_pokemon)
+    
     if game not in Generation_1:
-        for devolution_name in getattr(found_pokemon, 'devolutions', []):
+        #Reset Devolvable status of devolutions to Uncaught
+        for devolution_name in devolutions:
             devolution_pokemon = get_object_from_save(save_data, devolution_name, ObjectType.POKEMON)
-            if devolution_pokemon and devolution_pokemon.status != "Uncaught":
-                if not config_mode:
-                    print(f"Also resetting devolution {devolution_pokemon.name.title()} to Uncaught.")
+            if devolution_pokemon and devolution_pokemon.status == "Devolvable":
                 devolution_pokemon.status = "Uncaught"
                 for location in save_data.locations:
                     location.reset_pokemon_status_in_area(devolution_pokemon.name)
                 if devolution_pokemon.name in save_data.unavailable_pokemon and devolution_pokemon.name not in save_data.remaining_unavailable_pokemon:
                     save_data.remaining_unavailable_pokemon.append(devolution_pokemon.name)
+        #IF another pokemon in the evolution chain is caught, correct statuses
+        for devolution_name in devolutions:
+            devolution_pokemon = get_object_from_save(save_data, devolution_name, ObjectType.POKEMON)
+            if devolution_pokemon and devolution_pokemon.status == "Caught":
+                handle_evolution_tracking(game, save_data, devolution_pokemon)
+                return
 
 def catch_pokemon(game_name, pokemon_name, evolution_track=False, breed_baby=False):
     game = get_game_enum(game_name)
@@ -65,7 +93,7 @@ def catch_pokemon(game_name, pokemon_name, evolution_track=False, breed_baby=Fal
         print(f"You hatched a {pokemon_name.title()} from an egg!")
     
     for location in save_data.locations:
-        location.update_pokemon_status_in_area(found_pokemon.name)
+        location.update_pokemon_status_in_area(game, found_pokemon.name)
     
     if found_pokemon.name in save_data.remaining_unavailable_pokemon:
         save_data.remaining_unavailable_pokemon.remove(found_pokemon.name)
@@ -103,8 +131,8 @@ def evolve_pokemon(game_name, pokemon_name, evolved_pokemon_name=None):
         found_pokemon.status = "Caught"
         print(f"{found_pokemon.name.title()} evolved from {found_pokemon.devolutions[-1].title()}")
         for location in save_data.locations:
-            location.update_pokemon_status_in_area(found_pokemon.name, modification_type=ModificationType.EVOLVE)
-    
+            location.update_pokemon_status_in_area(game, found_pokemon.name, modification_type=ModificationType.EVOLVE)
+
     elif found_pokemon.status == "Uncaught":
         if found_pokemon.devolutions:
             next_devolution = get_object_from_save(save_data, found_pokemon.devolutions[-1], ObjectType.POKEMON)
@@ -112,7 +140,7 @@ def evolve_pokemon(game_name, pokemon_name, evolved_pokemon_name=None):
                 found_pokemon.status = "Caught"
                 print(f"{found_pokemon.name.title()} evolved from {next_devolution.name.title()}")
                 for location in save_data.locations:
-                    location.update_pokemon_status_in_area(found_pokemon.name, modification_type=ModificationType.EVOLVE)
+                    location.update_pokemon_status_in_area(game, found_pokemon.name, modification_type=ModificationType.EVOLVE)
             else:
                 print(f"Cannot evolve {found_pokemon.name.title()} because its pre-evolution {next_devolution.name.title()} is not marked as caught.")
                 print(f"No changes made. Please catch or evolve {next_devolution.name.title()} first.")
@@ -127,10 +155,11 @@ def evolve_pokemon(game_name, pokemon_name, evolved_pokemon_name=None):
     elif found_pokemon.status == "Caught":
         if found_pokemon.evolutions:
             if not evolved_pokemon_name:
-                if game in Generation_1 and found_pokemon.name in complex_evolutions['gen_1']:
-                    print(f"Pokemon {found_pokemon.name.title()} has multiple possible evolutions. Please specify which evolution to evolve into using the --into argument")
-                    print(f"Possible evolutions are: {', '.join([evo.title() for evo in found_pokemon.evolutions])}. No changes made.")
-                    return
+                for generation, generation_games in complex_evolutions_map.items():
+                    if game in generation_games and found_pokemon.name in complex_evolutions[generation]:
+                        print(f"Pokemon {found_pokemon.name.title()} has multiple possible evolutions. Please specify which evolution to evolve into using the --into argument")
+                        print(f"Possible evolutions are: {', '.join([evo.title() for evo in found_pokemon.evolutions])}. No changes made.")
+                        return
                 evolved_pokemon_name = found_pokemon.evolutions[0]
             
             if evolved_pokemon_name not in found_pokemon.evolutions:
@@ -152,7 +181,7 @@ def evolve_pokemon(game_name, pokemon_name, evolved_pokemon_name=None):
                 evolved_pokemon.status = "Caught"
                 print(f"{found_pokemon.name.title()} evolved into {evolved_pokemon.name.title()}")
                 for location in save_data.locations:
-                    location.update_pokemon_status_in_area(evolved_pokemon.name, modification_type=ModificationType.EVOLVE)
+                    location.update_pokemon_status_in_area(game, evolved_pokemon.name, modification_type=ModificationType.EVOLVE)
             
     
     else:

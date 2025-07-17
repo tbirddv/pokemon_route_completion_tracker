@@ -38,6 +38,10 @@ complex_evolutions = {
     'gen_1': ['eevee']
 }
 
+complex_evolutions_map = {
+    'gen_1': Generation_1
+}
+
 TRADE_EVOLUTIONS = {
     "alakazam", "machamp", "golem", "gengar"
 }

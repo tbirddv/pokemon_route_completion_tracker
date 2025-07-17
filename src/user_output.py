@@ -49,9 +49,8 @@ def simple_area_report(game_name, area_name, companion_mode=False):
             print("No Pokemon not found in this game can be caught in this area in companion games.")
     total_pokemon = len(found_area.encounter_data[game.value]['const']['All'])
     if total_pokemon != 0:
-        filtered_caught = filter_pokemon_list(found_area.caught, found_area.encounter_data[game.value]['const']['All'])
-        filtered_caught_count = len(filtered_caught)
-        print(f"{create_progress_bar(filtered_caught_count, total_pokemon, width=get_terminal_width(default=80)/2)} {filtered_caught_count/total_pokemon*100:.2f}% Complete.")
+        caught = len(found_area.caught)
+        print(f"{create_progress_bar(caught, total_pokemon, width=get_terminal_width(default=80)/2)} {caught/total_pokemon*100:.2f}% Complete.")
 
 def detailed_area_report(game_name, area_name, **kwargs):
     
@@ -106,10 +105,10 @@ def detailed_area_report(game_name, area_name, **kwargs):
             print('\n'.join(companion_games_reports))
         else:
             print("No Pokemon not found in this game are found in this area in the other games in this generation.")
-    filtered_caught = filter_pokemon_list(found_area.caught, found_area.encounter_data[game.value]['const']['All'])
-    filtered_caught_count = len(filtered_caught)
     total_pokemon = len(found_area.encounter_data[game.value]['const']['All'])
-    print(f"{create_progress_bar(filtered_caught_count, total_pokemon, width=get_terminal_width(default=80)/2)} {filtered_caught_count/total_pokemon*100:.2f}% Complete.")
+    if total_pokemon != 0:
+        caught = len(found_area.caught)
+        print(f"{create_progress_bar(caught, total_pokemon, width=get_terminal_width(default=80)/2)} {caught/total_pokemon*100:.2f}% Complete.")
 
 def basic_individual_pokemon_report(game_name, pokemon_name, location=False, companions=False):
     game = get_game_enum(game_name)
@@ -129,7 +128,7 @@ def basic_individual_pokemon_report(game_name, pokemon_name, location=False, com
         if found_pokemon.name in TRADE_EVOLUTIONS:
             print(f"{found_pokemon.name.title()} is not caught, but can be obtained by trading {found_pokemon.devolutions[-1].title()} with another player.")
         else:
-            print(f"{found_pokemon.name.title()} is not caught, but can be evolved from {' -> '.join([p.title() for p in found_pokemon.devolutions])}.")
+            print(f"{found_pokemon.name.title()} is not caught, but can be evolved via {' -> '.join([p.title() for p in found_pokemon.devolutions])} -> {found_pokemon.name.title()}.")
     elif found_pokemon.status == "Devolvable":
         print(f"{found_pokemon.name.title()} is not caught, but can be obtained by breeding {' or '.join([p.title() for p in found_pokemon.evolutions])}.")
     else:

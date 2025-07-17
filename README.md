@@ -288,8 +288,6 @@ poketracker hatch magikarp
 ### reset-pokemon
 Resets a Pokemon's status to uncaught.
 
-**WARNING:** If Evolution tracking is enabled, this command will also reset the status of all Pokemon in its evolution chain. (i.e. If Bulbasaur and Ivysaur are both marked as caught, command `reset-pokemon ivysaur` will reset both Bulbasaur and Ivysaur to uncaught)
-
 **Required Arguments:**
 - `pokemon_name`: Name of Pokemon to be reset
 
