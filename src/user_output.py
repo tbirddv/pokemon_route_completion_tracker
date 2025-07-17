@@ -1,6 +1,6 @@
 from operator import sub
 from src.utils import get_game_enum,  load_save_file, get_terminal_width, format_list_for_output, get_object_from_save, ObjectType
-from Data.constants import SupportedGames, Generation_1
+from Data.constants import SupportedGames, Generation_1, TRADE_EVOLUTIONS
 from src.pokemon import Local_Gen1, Pokemon
 from src.location import Gen1Location, Location
 from src.report_utils import *
@@ -47,6 +47,11 @@ def simple_area_report(game_name, area_name, companion_mode=False):
             print("\n".join(companion_reports))
         else:
             print("No Pokemon not found in this game can be caught in this area in companion games.")
+    total_pokemon = len(found_area.encounter_data[game.value]['const']['All'])
+    if total_pokemon != 0:
+        filtered_caught = filter_pokemon_list(found_area.caught, found_area.encounter_data[game.value]['const']['All'])
+        filtered_caught_count = len(filtered_caught)
+        print(f"{create_progress_bar(filtered_caught_count, total_pokemon, width=get_terminal_width(default=80)/2)} {filtered_caught_count/total_pokemon*100:.2f}% Complete.")
 
 def detailed_area_report(game_name, area_name, **kwargs):
     
@@ -101,6 +106,10 @@ def detailed_area_report(game_name, area_name, **kwargs):
             print('\n'.join(companion_games_reports))
         else:
             print("No Pokemon not found in this game are found in this area in the other games in this generation.")
+    filtered_caught = filter_pokemon_list(found_area.caught, found_area.encounter_data[game.value]['const']['All'])
+    filtered_caught_count = len(filtered_caught)
+    total_pokemon = len(found_area.encounter_data[game.value]['const']['All'])
+    print(f"{create_progress_bar(filtered_caught_count, total_pokemon, width=get_terminal_width(default=80)/2)} {filtered_caught_count/total_pokemon*100:.2f}% Complete.")
 
 def basic_individual_pokemon_report(game_name, pokemon_name, location=False, companions=False):
     game = get_game_enum(game_name)
@@ -113,11 +122,14 @@ def basic_individual_pokemon_report(game_name, pokemon_name, location=False, com
         print(f"Pokemon {pokemon_name} not found in save data for game {game.value}. Please ensure correct game is loaded and Pokemon name is accurate.")
         return
     
-    print(f"\n--- Basic Report for: #{found_pokemon.id} {found_pokemon.name.title()} in Pokemon {game.value} ---")
+    print(f"\n--- Report for: #{found_pokemon.id} {found_pokemon.name.title()} in Pokemon {game.value} ---")
     print()
     print("Status:")
     if found_pokemon.status == "Evolvable":
-        print(f"{found_pokemon.name.title()} is not caught, but can be evolved from {' -> '.join([p.title() for p in found_pokemon.devolutions])}.")
+        if found_pokemon.name in TRADE_EVOLUTIONS:
+            print(f"{found_pokemon.name.title()} is not caught, but can be obtained by trading {found_pokemon.devolutions[-1].title()} with another player.")
+        else:
+            print(f"{found_pokemon.name.title()} is not caught, but can be evolved from {' -> '.join([p.title() for p in found_pokemon.devolutions])}.")
     elif found_pokemon.status == "Devolvable":
         print(f"{found_pokemon.name.title()} is not caught, but can be obtained by breeding {' or '.join([p.title() for p in found_pokemon.evolutions])}.")
     else:
@@ -130,22 +142,23 @@ def basic_individual_pokemon_report(game_name, pokemon_name, location=False, com
             print(formated_locations)
         else:
             print("Not found in any locations in current game.")
-    print()
-    if companions:
-        print(f"Locations {found_pokemon.name.title()} is found in other games in this generation:")
-        for game_in_gen, locs in found_pokemon.locations.items():
-            if game_in_gen == game.value:
-                continue
-            if locs:
-                print(format_pokemon_data(game_in_gen, [loc for loc in locs], get_terminal_width(default=80), indent_level=2))
-            else:
-                print(f"  {game_in_gen}: Not found in any locations in this game.")
+        print()
+        if companions:
+            print(f"Locations {found_pokemon.name.title()} is found in other games in this generation:")
+            for game_in_gen, locs in found_pokemon.locations.items():
+                if game_in_gen == game.value:
+                    continue
+                if locs:
+                    print(format_pokemon_data(game_in_gen, [loc for loc in locs], get_terminal_width(default=80), indent_level=2))
+                else:
+                    print(f"  {game_in_gen}: Not found in any locations in this game.")
 
 
 def simple_completion_report(game_name):
     game = get_game_enum(game_name)
     save_data = load_save_file(game.value)
     total_pokemon, caught_count, evolvable_count, breedable_count, percentage_complete = completion_calcs(save_data.pokemon)
+    print(f"\n--- Simple Completion Report for Pokemon {game.value} ---\n")
     print(f"Total Pokemon: {total_pokemon}")
     print(f"Caught Pokemon: {caught_count}")
     if evolvable_count > 0:
@@ -153,12 +166,13 @@ def simple_completion_report(game_name):
     if breedable_count > 0:
         print(f"Breedable Pokemon (not caught, but can be obtained by breeding another caught Pokemon): {breedable_count}")
     print(f"Uncaught Pokemon: {total_pokemon - caught_count}")
+    print(create_progress_bar(caught_count, total_pokemon, width=get_terminal_width(default=80)/2))
     print(f"Your Pokedex is {percentage_complete:.2f}% complete.")
 
 def detailed_completion_report(game_name, companion=False):
     game = get_game_enum(game_name)
     save_data = load_save_file(game.value)
-    
+    print(f"\n--- Detailed Completion Report for Pokemon {game.value} ---\n")
     terminal_width = get_terminal_width(default=80)
 
     caught_pokemon, uncaught_pokemon, evolvable_pokemon, breedable_pokemon, unavailable_pokemon = build_completion_lists(save_data, companion_mode=companion)
@@ -170,34 +184,126 @@ def detailed_completion_report(game_name, companion=False):
     print(f"Total Pokemon: {total_pokemon}")
     print(f"Caught Pokemon: {caught_count}")
     print(f"Uncaught Pokemon: {uncaught_count}")
+    print(create_progress_bar(caught_count, total_pokemon, width=terminal_width/2))
     print(f"Your Pokedex is {caught_count / total_pokemon * 100:.2f}% complete.")
     print()
     print("Caught Pokemon:")
     if caught_pokemon:
-        formated_caught = format_list_for_output([p.name for p in caught_pokemon], indent_level=2, max_width=terminal_width)
+        formated_caught = format_list_for_output([mon.name for mon in sorted(caught_pokemon, key=lambda p: p.national_id)], indent_level=2, max_width=terminal_width)
         print(formated_caught)
     else:
         print("  None")
     print()
     if uncaught_pokemon:
         print("Uncaught Pokemon:")
-        formated_uncaught = format_list_for_output([p.name for p in uncaught_pokemon], indent_level=2, max_width=terminal_width)
+        formated_uncaught = format_list_for_output([mon.name for mon in sorted(uncaught_pokemon, key=lambda p: p.national_id)], indent_level=2, max_width=terminal_width)
         print(formated_uncaught)
     else:
         print("All Pokemon have been caught! Congratulations!")
     print()
     if evolvable_pokemon:
         print("Evolvable Pokemon (not caught, but can be evolved from another caught Pokemon):")
-        formated_evolvable = format_list_for_output([p.name for p in evolvable_pokemon], indent_level=2, max_width=terminal_width)
+        formated_evolvable = format_list_for_output([mon.name for mon in sorted(evolvable_pokemon, key=lambda p: p.national_id)], indent_level=2, max_width=terminal_width)
         print(formated_evolvable)
         print()
     if breedable_pokemon:
         print("Breedable Pokemon (not caught, but can be obtained by breeding another caught Pokemon):")
-        formated_breedable = format_list_for_output([p.name for p in breedable_pokemon], indent_level=2, max_width=terminal_width)
+        formated_breedable = format_list_for_output([mon.name for mon in sorted(breedable_pokemon, key=lambda p: p.national_id)], indent_level=2, max_width=terminal_width)
         print(formated_breedable)
         print()
     if unavailable_pokemon:
         print("Uncaught pokemon not available in this game (e.g., version exclusives, event-only):")
-        formated_unavailable = format_list_for_output(unavailable_pokemon, indent_level=2, max_width=terminal_width)
+        formated_unavailable = format_list_for_output([unavailable.title() for unavailable in unavailable_pokemon], indent_level=2, max_width=terminal_width)
         print(formated_unavailable)
     print()
+
+def show_remaining_exclusives(game_name):
+    game = get_game_enum(game_name)
+    save_data = load_save_file(game.value)
+
+    if not save_data.remaining_unavailable_pokemon:
+        print("All version exclusive and event pokemon have been caught!")
+        return
+    
+    print(f"Remaining version exclusive and event pokemon not caught in Pokemon {game.value}:")
+    terminal_width = get_terminal_width(default=80)
+    formated_unavailable = format_list_for_output(save_data.remaining_unavailable_pokemon, indent_level=2, max_width=terminal_width)
+    print(formated_unavailable)
+
+def build_completion_report_by_area(game_name, detailed=False):
+    game = get_game_enum(game_name)
+    save_data = load_save_file(game.value)
+    terminal_width = get_terminal_width(default=80)
+    if detailed:
+        print(f"--- Detailed Completion Report by Area for Pokemon {game.value} ---\n")
+    else:
+        print(f"--- Simple Completion Report by Area for Pokemon {game.value} ---\n")
+    for location in save_data.locations:
+        caught = location.caught
+        total = location.encounter_data[game.value]['const']['All']
+        version_filtered_caught = filter_pokemon_list(caught, total)
+        caught_count = len(version_filtered_caught)
+        total_count = len(total)
+        percentage_complete = (caught_count / total_count * 100) if total_count > 0 else 0
+        status = f"{caught_count}/{total_count} ({percentage_complete:.2f}% complete)" if total_count > 0 else "N/A"
+        if not detailed:
+            print(f"{create_progress_bar(caught_count, total_count, width=terminal_width/4)} {location.name}: {status}")
+        else:
+            print(f"{location.name}:")
+            print(create_progress_bar(caught_count, total_count, width=terminal_width/2))
+            if not version_filtered_caught:
+                print("  Caught: None")
+            else:
+                print(format_pokemon_data("Caught", version_filtered_caught, terminal_width, indent_level=2))
+            if not location.encounter_data[game.value]['uncaught']['All']:
+                print("  Uncaught: None")
+            else:
+                print(format_pokemon_data("Uncaught", location.encounter_data[game.value]['uncaught']['All'], terminal_width, indent_level=2))
+            print(f"  Completion: {status}\n")
+    print("\nOverall Completion:")
+    total_pokemon, caught_count, evolvable_count, breedable_count, percentage_complete = completion_calcs(save_data.pokemon)
+    print(create_progress_bar(caught_count, total_pokemon, width=terminal_width/2))
+    print(f"Your Pokedex is {percentage_complete:.2f}% complete. ({caught_count}/{total_pokemon} caught)")
+
+def items_needed_for_area_report(game_name, area_name):
+    game = get_game_enum(game_name)
+    save_data = load_save_file(game.value)
+    area_name = area_name.strip().lower()
+
+    found_area = get_object_from_save(save_data, area_name, ObjectType.LOCATION)
+
+    if not found_area:
+        print(f"Area {area_name} not found in save data for game {game.value}. Please ensure correct game is loaded and area name is accurate.")
+        return
+    
+    area_const_data = found_area.encounter_data.get(game.value, {}).get('const', {})
+
+    items_had = []
+    items_needed = []
+
+    if area_const_data.get('Surfing', {}):
+        if save_data.settings.surf:
+            items_had.append('HM Surf')
+        else:
+            items_needed.append('HM Surf')
+
+    if area_const_data.get('Fishing', {}):
+        for rod_type in ['Old Rod', 'Good Rod', 'Super Rod']:
+            if area_const_data['Fishing'].get(rod_type, []):
+                if getattr(save_data.settings, rod_type.replace(" ", "_").lower()):
+                    items_had.append(rod_type)
+                else:
+                    items_needed.append(rod_type)
+
+    print()
+    print(f"Items needed to catch all Pokemon in {found_area.name} in Pokemon {game.value}:")
+    if items_had:
+        print("\nAlready Have:")
+        print(f"  {', '.join(items_had)}")
+    if items_needed:
+        print("\nStill Needed:")
+        print(f"  {', '.join(items_needed)}")
+    if not items_had and not items_needed:
+        print("No items are needed for this area.")
+    print()
+

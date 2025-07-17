@@ -37,3 +37,7 @@ generation_1_location_column_name_mappings = {
 complex_evolutions = {
     'gen_1': ['eevee']
 }
+
+TRADE_EVOLUTIONS = {
+    "alakazam", "machamp", "golem", "gengar"
+}

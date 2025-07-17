@@ -105,14 +105,32 @@ def evolve_pokemon(game_name, pokemon_name, evolved_pokemon_name=None):
         for location in save_data.locations:
             location.update_pokemon_status_in_area(found_pokemon.name, modification_type=ModificationType.EVOLVE)
     
+    elif found_pokemon.status == "Uncaught":
+        if found_pokemon.devolutions:
+            next_devolution = get_object_from_save(save_data, found_pokemon.devolutions[-1], ObjectType.POKEMON)
+            if next_devolution.status == "Caught":
+                found_pokemon.status = "Caught"
+                print(f"{found_pokemon.name.title()} evolved from {next_devolution.name.title()}")
+                for location in save_data.locations:
+                    location.update_pokemon_status_in_area(found_pokemon.name, modification_type=ModificationType.EVOLVE)
+            else:
+                print(f"Cannot evolve {found_pokemon.name.title()} because its pre-evolution {next_devolution.name.title()} is not marked as caught.")
+                print(f"No changes made. Please catch or evolve {next_devolution.name.title()} first.")
+                return
+        else:
+            print(f"Nothing evolves into {found_pokemon.name.title()} and it is marked as Uncaught.")
+            if found_pokemon.evolutions:
+                print(f"If you want to evolve {found_pokemon.name.title()} into {found_pokemon.evolutions[0].title()}, please mark it as Caught first.")
+            print(f"No changes made.")
+            return
+    
     elif found_pokemon.status == "Caught":
         if found_pokemon.evolutions:
             if not evolved_pokemon_name:
                 if game in Generation_1 and found_pokemon.name in complex_evolutions['gen_1']:
-                    if not evolved_pokemon_name:
-                        print(f"Pokemon {found_pokemon.name.title()} has multiple possible evolutions. Please specify which evolution to evolve into using the --into argument")
-                        print(f"Possible evolutions are: {', '.join([evo.title() for evo in found_pokemon.evolutions])}. No changes made.")
-                        return
+                    print(f"Pokemon {found_pokemon.name.title()} has multiple possible evolutions. Please specify which evolution to evolve into using the --into argument")
+                    print(f"Possible evolutions are: {', '.join([evo.title() for evo in found_pokemon.evolutions])}. No changes made.")
+                    return
                 evolved_pokemon_name = found_pokemon.evolutions[0]
             
             if evolved_pokemon_name not in found_pokemon.evolutions:

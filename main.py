@@ -2,12 +2,18 @@
 import argparse
 import sys
 import json
+import random
 from pathlib import Path
 from src.utils import get_game_enum, SaveData, save_game_data, load_save_file, change_tracked_game, load_app_config, update_app_config, AppConfig
 from Data.constants import SupportedGames
 from src.newgame import new_game, delete_game_save
 from src.game_status_update import catch_pokemon, reset_pokemon_status, handle_evolution_tracking, handle_evolvable_reset, evolve_pokemon
-from src.user_output import detailed_area_report, simple_area_report, basic_individual_pokemon_report, simple_completion_report, detailed_completion_report
+from src.user_output import (
+    detailed_area_report, simple_area_report,
+    basic_individual_pokemon_report, show_remaining_exclusives,
+    simple_completion_report, detailed_completion_report,
+    build_completion_report_by_area, items_needed_for_area_report   
+)
 
 def main():
     parser = argparse.ArgumentParser(
@@ -54,7 +60,7 @@ def main():
     hatch_parser.add_argument('pokemon_name', type=str, help='Name of the Pokemon to mark as caught via hatching')
     hatch_parser.set_defaults(func=handle_hatch_pokemon)
 
-    reset_parser = subparsers.add_parser('reset', help='Reset a Pokemon\'s status to uncaught WARNING: This command also completely resets status for evolutions and devolutions of the specified Pokemon if evolution tracking is enabled in config')
+    reset_parser = subparsers.add_parser('reset-pokemon', help='Reset a Pokemon\'s status to uncaught WARNING: This command also completely resets status for evolutions and devolutions of the specified Pokemon if evolution tracking is enabled in config')
     reset_parser.add_argument('pokemon_name', type=str, help='Name of the Pokemon to reset status for')
     reset_parser.set_defaults(func=handle_reset_pokemon)
 
@@ -62,6 +68,8 @@ def main():
     area_report_parser.add_argument('area_name', type=str, help='Name of the area to generate report for')
     report_complexity_group = area_report_parser.add_mutually_exclusive_group()
     report_complexity_group.add_argument('-S', '--simple', action='store_true', help='Generate a simple area report (caught and uncaught only)')
+    item_needed_group = area_report_parser.add_mutually_exclusive_group()
+    item_needed_group.add_argument('-i', '--items-needed', action='store_true', help='Generates a report of items needed to complete the area. Split into had and needed based on game save data')
     area_report_parser.add_argument('-w', '--walking', action='store_true', help='Generate a detailed area report including walking encounters')
     area_report_parser.add_argument('-f', '--fishing', action='store_true', help='Generate a detailed area report including fishing encounters')
     area_report_parser.add_argument('-s', '--surfing', action='store_true', help='Generate a detailed area report including surfing encounters')
@@ -76,8 +84,12 @@ def main():
     pokemon_report_parser.set_defaults(func=handle_pokemon_report)
 
     completion_report_parser = subparsers.add_parser('completion', help='Generate a completion report for the tracked game')
+    completion_report_parser.add_argument('-a', '--areas', action='store_true', help='Generate an area-by-area completion report')
     completion_report_parser.add_argument('-d', '--detailed', action='store_true', help='Generate a detailed completion report (caught, uncaught, and unavailable)')
     completion_report_parser.set_defaults(func=handle_completion_report)
+
+    exclusives_parser = subparsers.add_parser('exclusives', help='Show which version exclusives from companion games are still needed for the tracked game')
+    exclusives_parser.set_defaults(func=handle_exclusives)
 
     args = parser.parse_args()
 
@@ -91,7 +103,17 @@ def handle_new_game(args):
     new_game(args.game_name, overwrite=args.overwrite, cli_mode=True)
 
 def handle_delete_game(args):
-    delete_game_save(args.game_name)
+    if args.game_name:
+        delete_game_save(args.game_name)
+    else:
+        config = load_app_config()
+        if config.tracked_game is None:
+            print("No game currently being tracked. Please specify a game name to delete.")
+            return
+        delete_game_save(config.tracked_game)
+        print(f"Deleted save for currently tracked game: Pokemon {config.tracked_game.value}.")
+        config.tracked_game = None
+        update_app_config(config)
 
 def handle_change_config(args):
     if args.companion_tracker:
@@ -228,8 +250,17 @@ def handle_area_report(args):
     if config.tracked_game is None:
         print("No game currently being tracked. Please set a game using the 'change' command.")
         return
+    if args.area_name.lower() == "random" or args.area_name.lower() == "-r":
+        save_data = load_save_file(config.tracked_game.value)
+        if not save_data.locations:
+            print(f"No locations found for Pokemon {config.tracked_game.value}. Cannot select a random area.")
+            return
+        args.area_name = random.choice([loc.name for loc in save_data.locations if loc.encounter_data[config.tracked_game.value]['uncaught']['All']])
+        print(f"Randomly selected area: {args.area_name}")
     if args.simple:
         simple_area_report(config.tracked_game.value, args.area_name, companion_mode=config.companion_tracker)
+    elif args.items_needed:
+        items_needed_for_area_report(config.tracked_game.value, args.area_name)
     else:
         if not (args.walking or args.fishing or args.surfing or args.other or args.all):
             save_data=load_save_file(config.tracked_game.value)
@@ -255,10 +286,23 @@ def handle_completion_report(args):
     if config.tracked_game is None:
         print("No game currently being tracked. Please set a game using the 'change' command.")
         return
+    if args.areas:
+        if args.detailed:
+            build_completion_report_by_area(config.tracked_game.value, detailed=True)
+        else:
+            build_completion_report_by_area(config.tracked_game.value, detailed=False)
+        return
     if args.detailed:
         detailed_completion_report(config.tracked_game.value, companion=config.companion_tracker)
     else:
         simple_completion_report(config.tracked_game.value)
+
+def handle_exclusives(args):
+    config = load_app_config()
+    if config.tracked_game is None:
+        print("No game currently being tracked. Please set a game using the 'change' command.")
+        return
+    show_remaining_exclusives(config.tracked_game.value)
 
 if __name__ == "__main__":
     main()

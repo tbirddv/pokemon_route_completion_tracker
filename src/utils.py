@@ -105,7 +105,7 @@ def get_game_enum(game_name):
     try:
         return SupportedGames[game_name]
     except KeyError:
-        print(f"Unsupported game name: {game_name}. Please see readme for currently supported games.")
+        print(f"Unsupported game: Pokemon {game_name.title()}. Please see readme for currently supported games.")
         sys.exit(1)
 
 def get_backup_save_path(game_name:str) -> Path:
@@ -186,13 +186,11 @@ def update_app_config(config: AppConfig):
 
 def change_tracked_game(game_name):
     game = get_game_enum(game_name) if game_name else None
-    config = load_app_config()
-    config.tracked_game = game
-    update_app_config(config)
     if game:
+        config = load_app_config()
+        config.tracked_game = game
+        update_app_config(config)
         print(f"Now tracking Pokemon {game.value}.")
-    else:
-        print("No game is currently being tracked.")
 
 def format_list_for_output(items, indent_level, max_width):
     if not items:

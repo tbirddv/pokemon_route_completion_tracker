@@ -1,6 +1,21 @@
 from src.utils import format_list_for_output, get_terminal_width
 from src.location import Location
+from src.pokemon import Pokemon
 from collections import deque
+
+def create_progress_bar(current, total, width=40):
+    width = int(width)
+    if width < 10:
+        return ""
+    if total == 0:
+        return "[No Pokemon in area]"
+    
+    percentage = current / total
+    filled = int(width * percentage)
+    bar = "█" * filled + "░" * (width - filled)
+    return f"[{bar}]"
+
+
 
 def filter_pokemon_list(pokemon_list, filter_list=None):
     if not filter_list:
@@ -152,7 +167,7 @@ def build_detailed_report_for_game(game_name: str, location: Location, tracked_e
             report_lines.append("No uncaught Pokemon found in this area for the selected encounter types.")
     return "\n".join(report_lines)
 
-def completion_calcs(pokemon_list):
+def completion_calcs(pokemon_list : list[Pokemon]):
     total = len(pokemon_list)
     caught = 0
     evolvable = 0
@@ -164,7 +179,7 @@ def completion_calcs(pokemon_list):
             evolvable += 1
         elif pokemon.status.lower() == "devolvable":
             devolvable += 1
-    percent_caught = (caught / total * 100)
+    percent_caught = (caught / total * 100) if total > 0 else 0.0
 
     return total, caught, evolvable, devolvable, percent_caught
 
@@ -176,14 +191,12 @@ def build_completion_lists(save_data, companion_mode=False):
     unavailable = save_data.remaining_unavailable_pokemon if companion_mode else []
     for pokemon in save_data.pokemon:
         if pokemon.status.lower() == "caught":
-            caught.append(pokemon.name.title())
+            caught.append(pokemon)
         elif pokemon.status.lower() == "evolvable":
-            evolvable.append(pokemon.name.title())
+            evolvable.append(pokemon)
         elif pokemon.status.lower() == "devolvable":
-            devolvable.append(pokemon.name.title())
+            devolvable.append(pokemon)
         else:
-            uncaught.append(pokemon.name.title())
-    uncaught += evolvable
-    uncaught += devolvable
+            uncaught.append(pokemon)
         
     return caught, uncaught, evolvable, devolvable, unavailable
