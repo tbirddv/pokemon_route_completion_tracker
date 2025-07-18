@@ -17,49 +17,6 @@ Currently supports all games in the North American Version of Generation 1: Poke
 - Python 3.10 or higher (developed and tested with Python 3.12)
 - Linux/macOS (Works in WSL, standard Windows support not tested)
 
-### Recommended: Virtual Environment Setup
-
-This project includes configuration files for easy environment setup:
-
-**Using uv (fastest, recommended):**
-```bash
-# Install uv if you haven't already
-pip install uv
-
-# Create and activate virtual environment using project config
-uv venv
-source .venv/bin/activate  # Linux/macOS
-
-# Install dependencies (if any are added later)
-uv pip install -e .
-```
-
-**Using pyenv:**
-```bash
-# Install the Python version specified in .python-version
-pyenv install
-
-# The version will be automatically used when in the project directory
-```
-
-**Using standard venv:**
-```bash
-# Create virtual environment
-python3 -m venv .venv
-
-# Activate it
-source .venv/bin/activate  # Linux/macOS
-# or
-.venv\Scripts\activate     # Windows
-
-# Install dependencies (if any are added later)
-pip install -e .
-```
-
-**Other tools:**
-- **Poetry**: `poetry install`
-- **Pipenv**: `pipenv install`
-
 ## Installation
 
 ### Option 1: Automated Installation (Recommended)
