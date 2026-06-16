@@ -40,6 +40,12 @@ echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     rm "$POKETRACKER_PATH"
     echo -e "${GREEN}✓ Successfully removed poketracker${NC}"
+
+    COMPLETION_PATH="$HOME/.local/share/bash-completion/completions/poketracker"
+    if [ -f "$COMPLETION_PATH" ]; then
+        rm "$COMPLETION_PATH"
+        echo -e "${GREEN}✓ Removed bash completion file${NC}"
+    fi
 else
     echo "Uninstall cancelled."
 fi

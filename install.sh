@@ -11,6 +11,7 @@ NC='\033[0m' # No Color
 # Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MAIN_PY="$SCRIPT_DIR/main.py"
+COMPLETION_SOURCE="$SCRIPT_DIR/completions/poketracker.bash"
 
 # Check if main.py exists
 if [ ! -f "$MAIN_PY" ]; then
@@ -63,6 +64,21 @@ ln -s "$MAIN_PY" "$SYMLINK_PATH"
 
 echo -e "${GREEN}✓ Successfully created symlink: $SYMLINK_PATH -> $MAIN_PY${NC}"
 
+# Install bash completion script if present
+if [ -f "$COMPLETION_SOURCE" ]; then
+    COMPLETION_DIR="$HOME/.local/share/bash-completion/completions"
+    COMPLETION_TARGET="$COMPLETION_DIR/poketracker"
+    mkdir -p "$COMPLETION_DIR"
+    cp "$COMPLETION_SOURCE" "$COMPLETION_TARGET"
+    echo -e "${GREEN}✓ Installed bash completion: $COMPLETION_TARGET${NC}"
+
+    # If this shell supports completion, load it now for immediate use.
+    if command -v complete >/dev/null 2>&1; then
+        # shellcheck source=/dev/null
+        source "$COMPLETION_TARGET" || true
+    fi
+fi
+
 # Check if the bin directory is in PATH
 if [[ ":$PATH:" != *":$BIN_DIR:"* ]]; then
     echo -e "${YELLOW}Warning: $BIN_DIR is not in your PATH.${NC}"
@@ -79,6 +95,12 @@ else
     echo ""
     echo "You can now use the command anywhere:"
     echo "    poketracker --help"
+fi
+
+if [ -f "$HOME/.local/share/bash-completion/completions/poketracker" ]; then
+    echo ""
+    echo "Tab completion installed for bash."
+    echo "If completion doesn't activate immediately, restart your terminal."
 fi
 
 echo ""

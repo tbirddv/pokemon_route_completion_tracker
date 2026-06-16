@@ -30,6 +30,7 @@ Currently supports all games in the North American Version of Generation 1: Poke
    ```
 
 This will create a symlink called `poketracker` in your `~/.local/bin` directory (or `~/bin` if it exists) so you can use the command from anywhere.
+It also installs a bash tab-completion file at `~/.local/share/bash-completion/completions/poketracker`.
 
 If `~/.local/bin` is not in your PATH, the installer will provide instructions to add it.
 
@@ -55,6 +56,21 @@ If `~/.local/bin` is not in your PATH, the installer will provide instructions t
 You can also run the program directly without installation:
 ```bash
 python3 main.py [commands]
+```
+
+## Tab Completion
+
+After running `./install.sh`, bash completion is installed automatically.
+
+If tab completion is not active yet, restart your terminal or run:
+```bash
+source ~/.local/share/bash-completion/completions/poketracker
+```
+
+For zsh users, enable bash completion compatibility and source the same file:
+```bash
+autoload -U +X bashcompinit && bashcompinit
+source ~/.local/share/bash-completion/completions/poketracker
 ```
 
 ## Usage
