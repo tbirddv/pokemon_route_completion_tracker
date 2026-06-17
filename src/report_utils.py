@@ -17,12 +17,12 @@ def create_progress_bar(current, total, width=40):
 
 
 
-def filter_pokemon_list(pokemon_list, filter_list=None):
+def filter_pokemon_list(pokemon_list: list[str], filter_list: list[str]=None) -> list[str]:
     if not filter_list:
         return pokemon_list
-    return [p for p in pokemon_list if p in filter_list]
+    return [p for p in pokemon_list if p.lower() in filter_list]
 
-def format_pokemon_data(level_name: str, level_data: list, width: int, filter_list=None, indent_level=4):
+def format_pokemon_data(level_name: str, level_data: list[str], width: int, filter_list: list[str]=None, indent_level=4) -> str:
     if not level_data:
         return ""
     filtered_data = filter_pokemon_list(level_data, filter_list)

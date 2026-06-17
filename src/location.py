@@ -37,7 +37,7 @@ class Location:
 class Gen1Location(Location):
     def __init__(self, name, encounter_data, caught = None, evolvable = None, devolvable = None):
         super().__init__(name, caught, evolvable, devolvable)
-        self.encounter_data = encounter_data
+        self.encounter_data: dict[str, dict] = encounter_data
 
     @staticmethod
     def _process_walking_or_surfing(encounter_string):

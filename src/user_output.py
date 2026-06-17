@@ -60,7 +60,7 @@ def detailed_area_report(game_name, area_name, **kwargs):
     static_subtypes = {"Gift", "Trade", "Buy", "Interact", "Revive", "uncaught"} #Static encounter subtypes always tracked
     tracked_encounter_types, tracked_subtypes = build_tracking_sets(**kwargs, static_subtypes=static_subtypes)
 
-    found_area = get_object_from_save(save_data, area_name, ObjectType.LOCATION)
+    found_area: "Location" = get_object_from_save(save_data, area_name, ObjectType.LOCATION)
 
     if not found_area:
         print(f"Area {area_name} not found in save data for game {game.value}. Please ensure correct game is loaded and area name is accurate.")
@@ -91,7 +91,7 @@ def detailed_area_report(game_name, area_name, **kwargs):
                 continue
 
             if kwargs.get("companion_details", False): #Detailed companion report
-                companion_game_report = build_detailed_report_for_game(game_in_generation, found_area, companion_game_location_summary, tracked_subtypes, companion_version=True, filtered_pokemon_list=save_data.remaining_unavailable_pokemon)
+                companion_game_report = build_detailed_report_for_game(game_in_generation, found_area, tracked_encounter_types, tracked_subtypes, companion_version=True, filtered_pokemon_list=save_data.remaining_unavailable_pokemon)
                 if companion_game_report.strip():
                     companion_games_reports.append(companion_game_report)
             else:
