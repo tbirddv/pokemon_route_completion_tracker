@@ -198,7 +198,8 @@ def detailed_completion_report(game_name, companion=False):
         formated_uncaught = format_list_for_output([mon.name for mon in sorted(uncaught_pokemon, key=lambda p: p.national_id)], indent_level=2, max_width=terminal_width)
         print(formated_uncaught)
     else:
-        print("All Pokemon have been caught! Congratulations!")
+        if uncaught_count == 0:
+            print("All Pokemon have been caught! Congratulations!")
     print()
     if evolvable_pokemon:
         print("Evolvable Pokemon (not caught, but can be evolved from another caught Pokemon):")
